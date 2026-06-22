@@ -862,86 +862,106 @@ Generated via Tobby Lv's Premium Portal
               </div>
 
               {/* Feed selection tab buttons */}
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-zinc-800 border border-zinc-800 rounded-xl overflow-hidden mb-6 shadow-xl">
                 <button
                   onClick={() => { setActiveCam(ActiveCam.FOCUS); setIsHoveringFocus(false); playWeirdSound('sweep'); }}
-                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.FOCUS 
-                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
-                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
+                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
+                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Eye className="w-4 h-4" /> TARGETED STARE
+                  <span className="flex items-center gap-3">
+                    <Eye className="w-5 h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider">TARGETED STARE</span>
                   </span>
-                  <span className="text-[9px] opacity-40 font-normal">01</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                    activeCam === ActiveCam.FOCUS 
+                      ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
+                      : 'bg-zinc-950 border-zinc-850 text-zinc-500'
+                  }`}>01</span>
                 </button>
 
                 <button
                   onClick={() => { setActiveCam(ActiveCam.HAZARD); playWeirdSound('sweep'); }}
-                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.HAZARD 
-                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
-                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
+                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
+                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Droplet className="w-4 h-4" /> LIQUID SPILL
+                  <span className="flex items-center gap-3">
+                    <Droplet className="w-5 h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider">LIQUID SPILL</span>
                   </span>
-                  <span className="text-[9px] opacity-40 font-normal">02</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                    activeCam === ActiveCam.HAZARD 
+                      ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
+                      : 'bg-zinc-950 border-zinc-850 text-zinc-500'
+                  }`}>02</span>
                 </button>
 
                 <button
                   onClick={() => { setActiveCam(ActiveCam.ACOUSTIC); playWeirdSound('sweep'); }}
-                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.ACOUSTIC 
-                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
-                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
+                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
+                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Volume2 className="w-4 h-4" /> SCARY SOUND
+                  <span className="flex items-center gap-3">
+                    <Volume2 className="w-5 h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider">SCARY SOUND</span>
                   </span>
-                  <span className="text-[9px] opacity-40 font-normal">03</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                    activeCam === ActiveCam.ACOUSTIC 
+                      ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
+                      : 'bg-zinc-950 border-zinc-850 text-zinc-500'
+                  }`}>03</span>
                 </button>
 
                 <button
                   onClick={() => { setActiveCam(ActiveCam.SCRATCH); playWeirdSound('sweep'); }}
-                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.SCRATCH 
-                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
-                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
+                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
+                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Plus className="w-4 h-4" /> HIT & SCRATCH
+                  <span className="flex items-center gap-3">
+                    <Plus className="w-5 h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider">HIT & SCRATCH</span>
                   </span>
-                  <span className="text-[9px] opacity-40 font-normal">04</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                    activeCam === ActiveCam.SCRATCH 
+                      ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
+                      : 'bg-zinc-950 border-zinc-850 text-zinc-500'
+                  }`}>04</span>
                 </button>
               </div>
 
               {/* VIDEO STREAM SELECTOR */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 mb-6 text-[10px] font-mono">
-                <span className="text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-1.5 select-none">
-                  <Play className="w-3 h-3 text-[#FF4500]" /> BACKGROUND FOOTAGE:
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 text-[10px] font-mono">
+                <span className="text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-1.5 select-none text-[11px]">
+                  <Play className="w-3.5 h-3.5 text-[#FF4500]" /> BACKGROUND FOOTAGE:
                 </span>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 bg-zinc-950 p-1 border border-zinc-850 rounded-lg">
                   <button
                     onClick={() => { setCctvVideoTrack(VideoFeedID.SIMULID); playWeirdSound('click'); }}
-                    className={`px-3 py-1 text-[10px] uppercase font-bold transition cursor-pointer ${
+                    className={`px-3 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded ${
                       cctvVideoTrack === VideoFeedID.SIMULID 
-                        ? 'text-[#FF4500] underline decoration-2' 
-                        : 'text-zinc-550 hover:text-zinc-300'
+                        ? 'bg-[#FF4500] text-black font-extrabold font-mono' 
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                   >
                     RAW_HUD
                   </button>
                   <button
                     onClick={() => { setCctvVideoTrack(VideoFeedID.VIDEO1); playWeirdSound('click'); }}
-                    className={`px-3 py-1 text-[10px] uppercase font-bold transition cursor-pointer ${
+                    className={`px-3 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded ${
                       cctvVideoTrack === VideoFeedID.VIDEO1 
-                        ? 'text-[#FF4500] underline decoration-2' 
-                        : 'text-zinc-550 hover:text-zinc-300'
+                        ? 'bg-[#FF4500] text-black font-extrabold font-mono' 
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                     title="Play tactical surveillance video feed 1"
                   >
@@ -949,10 +969,10 @@ Generated via Tobby Lv's Premium Portal
                   </button>
                   <button
                     onClick={() => { setCctvVideoTrack(VideoFeedID.VIDEO2); playWeirdSound('click'); }}
-                    className={`px-3 py-1 text-[10px] uppercase font-bold transition cursor-pointer ${
+                    className={`px-3 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded ${
                       cctvVideoTrack === VideoFeedID.VIDEO2 
-                        ? 'text-[#FF4500] underline decoration-2' 
-                        : 'text-zinc-550 hover:text-zinc-300'
+                        ? 'bg-[#FF4500] text-black font-extrabold font-mono' 
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                     title="Play tactical surveillance video feed 2"
                   >
@@ -962,7 +982,7 @@ Generated via Tobby Lv's Premium Portal
               </div>
 
               {/* FEED DIGITAL VIEWPORT */}
-              <div className="relative aspect-video w-full bg-black overflow-hidden">
+              <div className="relative aspect-video w-full bg-black overflow-hidden border border-zinc-850 rounded-2xl shadow-2xl">
                 {/* CRT Interference scanlines */}
                 <div className="absolute inset-x-0 h-0.5 bg-neutral-800/15 top-1/3 animate-pulse pointer-events-none z-15" />
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.30)_50%)] bg-[size:100%_4px] pointer-events-none z-15" />
@@ -996,44 +1016,47 @@ Generated via Tobby Lv's Premium Portal
 
                     {isHoveringFocus && (
                       <div 
-                        className="absolute w-10 h-10 border border-[#FF4500] border-dashed rounded-none pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
+                        className="absolute w-12 h-12 border border-[#FF4500] border-dashed rounded-none pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
                         style={{ left: `${focusCoord.x * 100}%`, top: `${focusCoord.y * 100}%` }}
                       >
-                        <div className="w-1.5 h-1.5 bg-[#FF4500] rounded-none" />
+                        <div className="w-2 h-2 bg-[#FF4500] rounded-none animate-ping" />
                       </div>
                     )}
 
                     {/* Highly stylized brutalist cat eye array */}
-                    <div className="flex gap-12 items-center justify-center py-4 relative">
+                    <div className="flex gap-16 items-center justify-center py-6 relative">
                       {/* Left Eye */}
-                      <div className="w-16 h-12 bg-yellow-400 rounded-[50%_15%] relative overflow-hidden flex items-center justify-center border-2 border-yellow-300 shadow-inner">
+                      <div className="w-28 h-20 bg-yellow-400 rounded-[50%_15%] relative overflow-hidden flex items-center justify-center border-4 border-yellow-300 shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)]">
                         <motion.div 
-                          className="w-3.5 h-10 bg-black rounded-none"
+                          className="w-5 h-16 bg-black rounded-none"
                           animate={{
-                            x: (focusCoord.x - 0.5) * 28,
-                            y: (focusCoord.y - 0.5) * 8,
+                            x: (focusCoord.x - 0.5) * 55,
+                            y: (focusCoord.y - 0.5) * 16,
                           }}
                           transition={{ type: 'spring', stiffness: 140, damping: 12 }}
                         />
                       </div>
                       {/* Right Eye */}
-                      <div className="w-16 h-12 bg-yellow-400 rounded-[50%_15%] relative overflow-hidden flex items-center justify-center border-2 border-yellow-300 shadow-inner">
+                      <div className="w-28 h-20 bg-yellow-400 rounded-[50%_15%] relative overflow-hidden flex items-center justify-center border-4 border-yellow-300 shadow-[inset_0_4px_10px_rgba(0,0,0,0.6)]">
                         <motion.div 
-                          className="w-3.5 h-10 bg-black rounded-none"
+                          className="w-5 h-16 bg-black rounded-none"
                           animate={{
-                            x: (focusCoord.x - 0.5) * 28,
-                            y: (focusCoord.y - 0.5) * 8,
+                            x: (focusCoord.x - 0.5) * 55,
+                            y: (focusCoord.y - 0.5) * 16,
                           }}
                           transition={{ type: 'spring', stiffness: 140, damping: 12 }}
                         />
                       </div>
                     </div>
 
-                    <p className="text-[10px] font-mono text-zinc-300 text-center uppercase tracking-widest mt-6">
-                      {isHoveringFocus 
-                        ? `LOC COORDS // X:${(focusCoord.x * 100).toFixed(0)} Y:${((1-focusCoord.y) * 100).toFixed(0)}` 
-                        : 'Move pointer here to simulate stare engagement'
-                      }
+                    <p className="text-xs font-mono text-zinc-300 text-center uppercase tracking-widest mt-6 flex items-center justify-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#FF4500] animate-pulse" />
+                      <span>
+                        {isHoveringFocus 
+                          ? `LOC COORDS // X:${(focusCoord.x * 100).toFixed(0)} Y:${((1-focusCoord.y) * 100).toFixed(0)}` 
+                          : 'MOVE POINTER HERE TO SIMULATE STARE ENGAGEMENT'
+                        }
+                      </span>
                     </p>
                   </div>
                 )}
@@ -1051,30 +1074,39 @@ Generated via Tobby Lv's Premium Portal
                       DEPLOY RADIAL cone liquid hazard (0.6M range)
                     </div>
 
+                    {/* Aiming/Tactical HUD Grid lines */}
+                    <div className="absolute inset-0 pointer-events-none z-0">
+                      <div className="absolute left-1/2 top-0 bottom-0 w-px border-l border-dashed border-zinc-800/60" />
+                      <div className="absolute top-1/2 left-0 right-0 h-px border-t border-dashed border-zinc-800/60" />
+                    </div>
+
                     {spills.map((spill) => (
                       <motion.div
                         key={spill.id}
-                        initial={{ opacity: 0, scale: 0.1 }}
-                        animate={{ opacity: [1, 0.8, 0], scale: 1.4 }}
+                        initial={{ opacity: 0, scale: 0.2 }}
+                        animate={{ opacity: [1, 0.9, 0], scale: 1.6 }}
                         transition={{ duration: 10 }}
-                        className="absolute w-28 h-28 pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                        className="absolute w-36 h-36 pointer-events-none -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center"
                         style={{ left: spill.x, top: spill.y }}
                       >
                         <div 
-                          className="w-full h-full bg-[#FF4500]/20 border-[#FF4500]/60 border-l border-r"
+                          className="w-full h-full bg-[#FF4500]/25 border-2 border-dashed border-[#FF4500]/70"
                           style={{ 
                             transform: `rotate(${spill.angle - 90}deg)`,
-                            clipPath: 'polygon(50% 0%, 5% 100%, 95% 100%)'
+                            clipPath: 'polygon(50% 0%, 15% 100%, 85% 100%)'
                           }}
                         />
+                        <div className="absolute bg-[#FF4500] text-black text-[9px] font-mono font-black px-1.5 py-0.5 rounded shadow mt-10 z-10 uppercase tracking-tight">
+                          ⚠️ SLIP ZONE
+                        </div>
                       </motion.div>
                     ))}
 
                     <div className="z-10 mb-4 text-center">
-                      <div className="text-[10px] text-[#FF4500] font-mono tracking-wider mb-2 uppercase">
+                      <div className="text-[10px] text-[#FF4500] font-mono tracking-wider mb-2 uppercase font-extrabold">
                         Origin Point: Tobby
                       </div>
-                      <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-wide">Click area to deploy 10-sec slip hazard zone</p>
+                      <p className="text-[11px] font-mono text-zinc-300 uppercase tracking-wider font-semibold">Click area to deploy 10-sec slip hazard zone</p>
                     </div>
                   </div>
                 )}
@@ -1088,25 +1120,43 @@ Generated via Tobby Lv's Premium Portal
                     }`}
                   >
                     {ripples.map((rip) => (
-                      <motion.div
-                        key={rip.id}
-                        initial={{ scale: 0.2, opacity: 1 }}
-                        animate={{ scale: 4.5, opacity: 0 }}
-                        transition={{ duration: 1.2 }}
-                        className="absolute w-24 h-24 border border-[#FF4500] rounded-none pointer-events-none -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
-                        style={{ left: rip.x, top: rip.y }}
-                      >
-                        <div className="w-16 h-16 border border-zinc-800 rounded-none" />
-                      </motion.div>
+                      <React.Fragment key={rip.id}>
+                        {/* Ring 1 */}
+                        <motion.div
+                          initial={{ scale: 0.1, opacity: 1 }}
+                          animate={{ scale: 6.0, opacity: 0 }}
+                          transition={{ duration: 1.4, ease: "easeOut" }}
+                          className="absolute w-32 h-32 border border-[#FF4500] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                          style={{ left: rip.x, top: rip.y }}
+                        />
+                        {/* Ring 2 */}
+                        <motion.div
+                          initial={{ scale: 0.1, opacity: 1 }}
+                          animate={{ scale: 4.0, opacity: 0 }}
+                          transition={{ duration: 1.4, ease: "easeOut", delay: 0.15 }}
+                          className="absolute w-32 h-32 border border-orange-500/60 rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                          style={{ left: rip.x, top: rip.y }}
+                        />
+                        {/* Ring 3 */}
+                        <motion.div
+                          initial={{ scale: 0.1, opacity: 1 }}
+                          animate={{ scale: 2.0, opacity: 0 }}
+                          transition={{ duration: 1.4, ease: "easeOut", delay: 0.3 }}
+                          className="absolute w-32 h-32 border border-red-550/30 rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                          style={{ left: rip.x, top: rip.y }}
+                        />
+                      </React.Fragment>
                     ))}
 
-                    <div className="text-center space-y-4">
-                      <div className="w-16 h-16 rounded-full border border-[#FF4500]/50 hover:border-[#FF4500] bg-black/10 flex items-center justify-center mx-auto transition">
-                        <Volume2 className="w-8 h-8 text-[#FF4500]" />
+                    <div className="text-center space-y-6">
+                      <div className="w-24 h-24 rounded-full border-2 border-[#FF4500] hover:border-orange-500 bg-[#FF4500]/10 hover:bg-[#FF4500]/25 flex items-center justify-center mx-auto transition-all duration-300 shadow-lg shadow-[#FF4500]/20 hover:scale-105 active:scale-95">
+                        <Volume2 className="w-12 h-12 text-[#FF4500]" />
                       </div>
                       <div>
-                        <p className="font-mono text-xs text-white tracking-wide">CLICK TO EMIT RADIAL MEOW WAVE</p>
-                        <p className="font-mono text-[9px] text-[#FF4500] uppercase tracking-widest mt-2">Projection Range: 3.0-meter radial blast</p>
+                        <p className="font-mono text-sm text-white font-extrabold tracking-wide uppercase">CLICK ANYWHERE TO EMIT RADIAL MEOW WAVE</p>
+                        <p className="font-mono text-[10px] text-[#FF4500] uppercase tracking-widest mt-2 bg-black/50 px-3 py-1 rounded inline-block border border-zinc-800 font-bold">
+                          Projection Range: 3.5-meter acoustic blast
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1120,9 +1170,18 @@ Generated via Tobby Lv's Premium Portal
                       cctvVideoTrack !== VideoFeedID.SIMULID ? 'bg-black/30' : 'bg-[#111]'
                     }`}
                   >
-                    <div className="relative w-24 h-40 border border-zinc-800 flex flex-col justify-between p-3 overflow-hidden">
-                      <div className="absolute inset-x-0 h-4 bg-orange-950/20 border-b border-[#FF4500]/50 top-2" />
-                      <span className="text-[9px] font-mono text-zinc-650 font-bold">TARGET DUMMY</span>
+                    <div className="relative w-36 h-56 border-2 border-zinc-700/80 bg-zinc-900/90 flex flex-col justify-between p-4 overflow-hidden rounded-md shadow-2xl">
+                      {/* Bullseye rings for target decoration */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                        <div className="w-28 h-28 border border-dashed border-zinc-500 rounded-full flex items-center justify-center animate-spin" style={{ animationDuration: '60s' }}>
+                          <div className="w-16 h-16 border border-dashed border-zinc-500 rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 border border-[#FF4500] rounded-full" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="absolute inset-x-0 h-5 bg-orange-950/20 border-b border-[#FF4500]/50 top-3" />
+                      <span className="text-[10px] font-mono text-zinc-400 font-bold tracking-wider z-10 text-center uppercase">TACTICAL DUMMY EX6</span>
 
                       {scratches.map((scratch) => (
                         <div 
@@ -1130,29 +1189,31 @@ Generated via Tobby Lv's Premium Portal
                           className="absolute pointer-events-none flex flex-col gap-0.5 shrink-0 -translate-x-1/2 -translate-y-1/2"
                           style={{ left: scratch.x, top: scratch.y, transform: `translate(-50%, -50%) rotate(${scratch.angle}deg)` }}
                         >
-                          <div className="w-8 h-[2.5px] bg-[#FF4500]" />
-                          <div className="w-9 h-[2.5px] bg-red-600" />
-                          <div className="w-7 h-[2.5px] bg-[#FF4500]" />
+                          <div className="w-12 h-[3.5px] bg-[#FF4500] shadow-[0_0_6px_#FF4500]" />
+                          <div className="w-14 h-[3.5px] bg-red-650 shadow-[0_0_6px_#ef4444]" />
+                          <div className="w-10 h-[3.5px] bg-amber-505 shadow-[0_0_6px_#f59e0b]" />
                         </div>
                       ))}
 
-                      <div className="text-zinc-550 font-mono text-[8px] text-center">CLICK TO APPLY SCRATCH INFLICTS</div>
+                      <div className="text-zinc-400 font-mono text-[9px] text-center tracking-wider z-10 leading-snug">
+                        CLICK BODY TO UNLEASH CLAW IMPACTS
+                      </div>
                     </div>
 
-                    <div className="absolute bottom-2 right-2 flex items-center gap-3">
-                      <span className="text-[10px] font-mono text-[#FF4500] font-bold">STRIKES: {scratches.length}</span>
+                    <div className="absolute bottom-3 right-3 flex items-center gap-4 bg-zinc-950/90 px-3 py-1.5 border border-zinc-800 rounded">
+                      <span className="text-xs font-mono text-[#FF4500] font-black tracking-widest">STRIKES: {scratches.length}</span>
                       <button 
                         onClick={(e) => { e.stopPropagation(); clearScratch(); playWeirdSound('dismiss'); }}
-                        className="text-zinc-400 hover:text-white font-mono text-[10px] uppercase cursor-pointer underline decoration-1 text-xs"
+                        className="text-white hover:text-red-500 font-mono text-xs uppercase cursor-pointer hover:underline font-bold transition-all"
                       >
-                        [RESET]
+                        [RESET TARGET]
                       </button>
                     </div>
                   </div>
                 )}
 
                 {/* CONTROL FEEDS FOOTER METAHUD */}
-                <div className="absolute bottom-3 right-4 left-4 flex justify-between items-center bg-black/70 backdrop-blur-sm p-1 text-[9px] font-mono z-30">
+                <div className="absolute bottom-3 right-4 left-4 flex justify-between items-center bg-black/70 backdrop-blur-sm p-1 text-[9px] font-mono z-30 animate-fade-in">
                   <span className="text-zinc-500">SIGNAL FEED ACTIVE // TACTICAL LAB</span>
                   <div className="flex items-center gap-4">
                     {cctvVideoTrack !== VideoFeedID.SIMULID && (
@@ -1170,7 +1231,7 @@ Generated via Tobby Lv's Premium Portal
                     )}
                     <button 
                       onClick={() => setIsFeedMuted(!isFeedMuted)} 
-                      className="text-zinc-500 hover:text-white transition cursor-pointer"
+                      className="text-zinc-505 hover:text-white transition cursor-pointer"
                     >
                       {isFeedMuted ? '[SYNTH_OFF]' : '[SYNTH_ACTIVE]'}
                     </button>
