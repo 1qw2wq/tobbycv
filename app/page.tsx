@@ -207,7 +207,7 @@ export default function TobbyLvCV() {
   const [spills, setSpills] = React.useState<{ id: number; x: number; y: number; angle: number }[]>([]);
 
   // Culinary Bowl candy simulation state
-  const [starchyBowl, setStarchyBowl] = React.useState<{ id: number; type: string; color: string; x: number; y: number }[]>([]);
+  const [starchyBowl, setStarchyBowl] = React.useState<{ id: number; type: string; color: string; x: number; y: number; angle: number }[]>([]);
   const [bowlProgress, setBowlProgress] = React.useState(3); // start with high glycemic rating.
 
   // Guide user about PDF export
@@ -565,14 +565,20 @@ Generated via Tobby Lv's Premium Portal
   };
 
   const addCandyToNoodle = (type: string, color: string) => {
-    const rx = 80 + Math.random() * 140;
-    const ry = 80 + Math.random() * 80;
+    // x represents direct horizontal offset in pixels from the bowl's vertical center (-38 to +38)
+    const rx = -38 + Math.random() * 76;
+    // Parabolic gravitational settling bottom function so candy rests inside the physical bowl bottom curve
+    const ry = 94 - (rx * rx) / 58 + (-3 + Math.random() * 6);
+    // Custom rotation angle for physical natural layout positioning
+    const angle = -45 + Math.random() * 90;
+    
     const newCandy = {
       id: Date.now(),
       type,
       color,
       x: rx,
-      y: ry
+      y: ry,
+      angle
     };
     setStarchyBowl(prev => [...prev, newCandy]);
     setBowlProgress(prev => Math.min(prev + 1, 10));
@@ -1419,15 +1425,54 @@ Generated via Tobby Lv's Premium Portal
                   <span className="text-[8px] font-mono text-zinc-550 uppercase tracking-widest">SAVORY SOUP BASE</span>
                 </div>
 
-                {starchyBowl.map((candy) => (
-                  <motion.div
-                    key={candy.id}
-                    initial={{ y: -30, opacity: 0 }}
-                    animate={{ y: candy.y - 10, opacity: 1 }}
-                    className="absolute w-3.5 h-2 rounded-none"
-                    style={{ left: `${candy.x - 30}px`, backgroundColor: candy.color }}
-                  />
-                ))}
+                {starchyBowl.map((candy) => {
+                  if (candy.type === 'Candy A') { // Jellybeans (oval pill)
+                    return (
+                      <motion.div
+                        key={candy.id}
+                        initial={{ x: "-50%", y: -35, opacity: 0, rotate: 0 }}
+                        animate={{ x: "-50%", y: candy.y, opacity: 1, rotate: candy.angle }}
+                        className="absolute w-4 h-2.5 rounded-full border border-black/30 shadow-md"
+                        style={{ 
+                          left: `calc(50% + ${candy.x}px)`, 
+                          top: 0,
+                          backgroundColor: candy.color,
+                        }}
+                        title="Jellybean"
+                      />
+                    );
+                  } else if (candy.type === 'Candy B') { // Candy Corn (triangle)
+                    return (
+                      <motion.div
+                        key={candy.id}
+                        initial={{ x: "-50%", y: -35, opacity: 0, rotate: 0 }}
+                        animate={{ x: "-50%", y: candy.y, opacity: 1, rotate: candy.angle }}
+                        className="absolute w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-b-[14px]"
+                        style={{ 
+                          left: `calc(50% + ${candy.x}px)`, 
+                          top: 0,
+                          borderBottomColor: candy.color,
+                        }}
+                        title="Candy Corn"
+                      />
+                    );
+                  } else { // Gumdrops (gumdrop dome)
+                    return (
+                      <motion.div
+                        key={candy.id}
+                        initial={{ x: "-50%", y: -35, opacity: 0, rotate: 0 }}
+                        animate={{ x: "-50%", y: candy.y, opacity: 1, rotate: candy.angle }}
+                        className="absolute w-4.5 h-3.5 rounded-t-full border border-black/20 shadow-md"
+                        style={{ 
+                          left: `calc(50% + ${candy.x}px)`, 
+                          top: 0,
+                          backgroundColor: candy.color,
+                        }}
+                        title="Gumdrop"
+                      />
+                    );
+                  }
+                })}
 
                 {starchyBowl.length === 0 && (
                   <span className="text-zinc-650 font-mono text-[9px] text-center px-4 uppercase tracking-wider animate-pulse">0% Additives. Drop starch elements below.</span>
@@ -1464,10 +1509,14 @@ Generated via Tobby Lv's Premium Portal
                 </div>
 
                 <div className="pt-4 mt-2">
-                  <div className="flex justify-between text-[9px] font-mono text-zinc-550">
-                    <span>GLYCEMIC INDEX LEVEL:</span>
+                  <div className="flex justify-between items-center text-[9px] font-mono">
+                    <span className="text-zinc-500">GLYCEMIC INDEX LEVEL:</span>
+                    <span className={starchyBowl.length === 0 ? "text-zinc-500 font-bold" : starchyBowl.length <= 3 ? "text-yellow-500 font-bold" : starchyBowl.length <= 6 ? "text-orange-500 font-bold animate-pulse" : "text-[#FF4500] font-black tracking-wider animate-bounce"}>
+                      {Math.min(starchyBowl.length * 15, 100)}% 
+                      ({starchyBowl.length === 0 ? "0% CLEAN" : starchyBowl.length <= 3 ? "STARCH WARNING" : starchyBowl.length <= 6 ? "HIGH GLYCEMIC" : "CRITICAL OVERLOAD!"})
+                    </span>
                   </div>
-                  <div className="h-0.5 bg-zinc-900 w-full mt-2 overflow-hidden">
+                  <div className="h-1 bg-zinc-950 w-full mt-2 overflow-hidden rounded-full">
                     <div 
                       className="h-full bg-[#FF4500] transition-all duration-300" 
                       style={{ width: `${Math.min(starchyBowl.length * 15, 100)}%` }} 
