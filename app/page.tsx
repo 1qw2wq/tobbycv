@@ -24,6 +24,8 @@ import {
   Square,
   Search,
   ExternalLink,
+  Youtube,
+  Gamepad2,
   ChefHat,
   Maximize2,
   Minimize2,
@@ -644,12 +646,23 @@ Generated via Tobby Lv's Premium Portal
                   &gt; Background Graphics: <span className="text-[#FF4500]">ENABLED</span><br />
                   &gt; Margins: <span className="text-white">NONE or DEFAULT</span>
                 </div>
-                <button 
-                  onClick={() => { setShowExportGuide(false); playWeirdSound('dismiss'); }}
-                  className="px-4 py-2 bg-white text-black font-extrabold text-xs uppercase hover:bg-transparent hover:text-white border border-white rounded-full transition-all cursor-pointer"
-                >
-                  Confirm & Close
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a 
+                    href="/print"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => { playWeirdSound('sonar'); }}
+                    className="px-4 py-2 bg-[#FF4500] text-black font-extrabold text-xs uppercase hover:bg-orange-600 border border-[#FF4500] rounded-full transition-all cursor-pointer text-center"
+                  >
+                    Open Standalone Printer Tab
+                  </a>
+                  <button 
+                    onClick={() => { setShowExportGuide(false); playWeirdSound('dismiss'); }}
+                    className="px-4 py-2 bg-transparent text-white font-extrabold text-xs uppercase hover:bg-white hover:text-black border border-white/45 rounded-full transition-all cursor-pointer"
+                  >
+                    Close Instruction
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -682,10 +695,22 @@ Generated via Tobby Lv's Premium Portal
                 onClick={() => { handlePrint(); playWeirdSound('sonar'); }}
                 id="download-pdf-portfolio"
                 className="text-[#FF4500] hover:text-white font-mono font-bold uppercase text-xs tracking-wider transition cursor-pointer hover:underline"
-                title="Prints standard single-sheet vector portfolio document"
+                title="Prints standard single-sheet vector portfolio document using window.print()"
               >
-                [DOWNLOAD_PORTFOLIO_PDF]
+                [PRINT_PORTFOLIO]
               </button>
+
+              <a
+                href="/print"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => { playWeirdSound('sonar'); }}
+                id="print-pdf-separate"
+                className="text-white hover:text-[#FF4500] font-mono font-bold uppercase text-xs tracking-wider transition hover:underline flex items-center gap-1.5 bg-[#FF4500]/10 px-3 py-1 bg-zinc-950 border border-[#FF4500]/30 hover:border-[#FF4500] rounded-md"
+                title="Opens separate clean tab designed for fault-proof printing and PDF saving"
+              >
+                <span>[PRINT_STATION]</span>
+              </a>
             </div>
           </div>
         </header>
@@ -702,6 +727,31 @@ Generated via Tobby Lv's Premium Portal
             <p className="mt-4 text-xs font-mono tracking-widest uppercase text-[#FF4500] max-w-2xl leading-relaxed">
               Location: Japan-Based [Chinese Heritage] // SPECIALIZATION: Tactical Presence, Non-Linguistic Studies, and Experimental Flavor Development
             </p>
+            {/* TACTICAL EXTERNAL TRANSMISSIONS */}
+            <div className="flex flex-wrap items-center gap-3 mt-4 print:hidden">
+              <a 
+                href="https://www.youtube.com/shorts/cB2BndeFG_Q" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => playWeirdSound('click')}
+                className="inline-flex items-center gap-2 px-3 py-1 bg-red-950/20 border border-red-900/40 hover:border-red-500 rounded text-[10px] font-mono font-bold text-red-400 hover:text-white transition-all shadow-md hover:shadow-red-500/10 cursor-pointer"
+                title="Watch Tobby's tactical broadcast on YouTube"
+              >
+                <Youtube className="w-3.5 h-3.5 text-red-500" />
+                <span>YOUTUBE BROADCAST</span>
+              </a>
+              <a 
+                href="https://tobby.cc.cd" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => playWeirdSound('click')}
+                className="inline-flex items-center gap-2 px-3 py-1 bg-[#FF4500]/10 border border-[#FF4500]/30 hover:border-[#FF4500] rounded text-[10px] font-mono font-bold text-[#FF4500] hover:text-white transition-all shadow-md hover:shadow-[#FF4500]/10 cursor-pointer"
+                title="Access Tobby's official interactive simulation / game"
+              >
+                <Gamepad2 className="w-3.5 h-3.5 text-[#FF4500]" />
+                <span>TOBBY.CC.CD [GAME]</span>
+              </a>
+            </div>
           </div>
           <div className="flex flex-col lg:items-end gap-3 font-mono print:hidden shrink-0">
             <div className="text-right text-xs text-[#FF4500] font-bold">
@@ -862,20 +912,21 @@ Generated via Tobby Lv's Premium Portal
               </div>
 
               {/* Feed selection tab buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-zinc-800 border border-zinc-800 rounded-xl overflow-hidden mb-6 shadow-xl">
+              <div id="feed-selection-grid" className="grid grid-cols-2 gap-0 bg-zinc-950 border border-zinc-850 rounded-xl overflow-hidden mb-6 shadow-xl">
                 <button
+                  id="cam-btn-focus"
                   onClick={() => { setActiveCam(ActiveCam.FOCUS); setIsHoveringFocus(false); playWeirdSound('sweep'); }}
-                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer border-r border-b border-zinc-850/60 ${
                     activeCam === ActiveCam.FOCUS 
-                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
-                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
+                      ? 'bg-zinc-900 font-bold text-[#FF4500]' 
+                      : 'bg-black/20 text-zinc-400 hover:text-white hover:bg-zinc-900/30'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <Eye className="w-5 h-5 text-[#FF4500]" /> 
-                    <span className="font-semibold tracking-wider">TARGETED STARE</span>
+                  <span className="flex items-center gap-2 sm:gap-3">
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider text-[10px] sm:text-xs">TARGETED STARE</span>
                   </span>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                  <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded border ${
                     activeCam === ActiveCam.FOCUS 
                       ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
                       : 'bg-zinc-950 border-zinc-850 text-zinc-500'
@@ -883,18 +934,19 @@ Generated via Tobby Lv's Premium Portal
                 </button>
 
                 <button
+                  id="cam-btn-hazard"
                   onClick={() => { setActiveCam(ActiveCam.HAZARD); playWeirdSound('sweep'); }}
-                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer border-b border-zinc-850/60 ${
                     activeCam === ActiveCam.HAZARD 
-                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
-                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
+                      ? 'bg-zinc-900 font-bold text-[#FF4500]' 
+                      : 'bg-black/20 text-zinc-400 hover:text-white hover:bg-zinc-900/30'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <Droplet className="w-5 h-5 text-[#FF4500]" /> 
-                    <span className="font-semibold tracking-wider">LIQUID SPILL</span>
+                  <span className="flex items-center gap-2 sm:gap-3">
+                    <Droplet className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider text-[10px] sm:text-xs">LIQUID SPILL</span>
                   </span>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                  <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded border ${
                     activeCam === ActiveCam.HAZARD 
                       ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
                       : 'bg-zinc-950 border-zinc-850 text-zinc-500'
@@ -902,18 +954,19 @@ Generated via Tobby Lv's Premium Portal
                 </button>
 
                 <button
+                  id="cam-btn-acoustic"
                   onClick={() => { setActiveCam(ActiveCam.ACOUSTIC); playWeirdSound('sweep'); }}
-                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
+                  className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer border-r border-zinc-850/60 ${
                     activeCam === ActiveCam.ACOUSTIC 
-                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
-                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
+                      ? 'bg-zinc-900 font-bold text-[#FF4500]' 
+                      : 'bg-black/20 text-zinc-400 hover:text-white hover:bg-zinc-900/30'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <Volume2 className="w-5 h-5 text-[#FF4500]" /> 
-                    <span className="font-semibold tracking-wider">SCARY SOUND</span>
+                  <span className="flex items-center gap-2 sm:gap-3">
+                    <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider text-[10px] sm:text-xs">SCARY SOUND</span>
                   </span>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                  <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded border ${
                     activeCam === ActiveCam.ACOUSTIC 
                       ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
                       : 'bg-zinc-950 border-zinc-850 text-zinc-500'
@@ -921,18 +974,19 @@ Generated via Tobby Lv's Premium Portal
                 </button>
 
                 <button
+                  id="cam-btn-scratch"
                   onClick={() => { setActiveCam(ActiveCam.SCRATCH); playWeirdSound('sweep'); }}
                   className={`py-4 px-4 text-xs sm:text-sm font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.SCRATCH 
-                      ? 'bg-zinc-950 font-bold text-[#FF4500]' 
-                      : 'bg-black/40 text-zinc-400 hover:text-white hover:bg-zinc-900/40'
+                      ? 'bg-zinc-900 font-bold text-[#FF4500]' 
+                      : 'bg-black/20 text-zinc-400 hover:text-white hover:bg-zinc-900/30'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <Plus className="w-5 h-5 text-[#FF4500]" /> 
-                    <span className="font-semibold tracking-wider">HIT & SCRATCH</span>
+                  <span className="flex items-center gap-2 sm:gap-3">
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF4500]" /> 
+                    <span className="font-semibold tracking-wider text-[10px] sm:text-xs">HIT & SCRATCH</span>
                   </span>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                  <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded border ${
                     activeCam === ActiveCam.SCRATCH 
                       ? 'bg-[#FF4500]/10 border-[#FF4500]/50 text-[#FF4500]' 
                       : 'bg-zinc-950 border-zinc-850 text-zinc-500'
@@ -945,12 +999,12 @@ Generated via Tobby Lv's Premium Portal
                 <span className="text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-1.5 select-none text-[11px]">
                   <Play className="w-3.5 h-3.5 text-[#FF4500]" /> BACKGROUND FOOTAGE:
                 </span>
-                <div className="flex items-center gap-2 shrink-0 bg-zinc-950 p-1 border border-zinc-850 rounded-lg">
+                <div className="flex items-center gap-0 shrink-0 bg-zinc-950 p-1 border border-zinc-850 rounded-lg overflow-hidden">
                   <button
                     onClick={() => { setCctvVideoTrack(VideoFeedID.SIMULID); playWeirdSound('click'); }}
-                    className={`px-3 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded ${
+                    className={`px-4 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded-l-md ${
                       cctvVideoTrack === VideoFeedID.SIMULID 
-                        ? 'bg-[#FF4500] text-black font-extrabold font-mono' 
+                        ? 'bg-[#FF4500] text-black font-extrabold font-mono shadow' 
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                   >
@@ -958,9 +1012,9 @@ Generated via Tobby Lv's Premium Portal
                   </button>
                   <button
                     onClick={() => { setCctvVideoTrack(VideoFeedID.VIDEO1); playWeirdSound('click'); }}
-                    className={`px-3 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded ${
+                    className={`px-4 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded-none border-x border-zinc-900/40 ${
                       cctvVideoTrack === VideoFeedID.VIDEO1 
-                        ? 'bg-[#FF4500] text-black font-extrabold font-mono' 
+                        ? 'bg-[#FF4500] text-black font-extrabold font-mono shadow' 
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                     title="Play tactical surveillance video feed 1"
@@ -969,9 +1023,9 @@ Generated via Tobby Lv's Premium Portal
                   </button>
                   <button
                     onClick={() => { setCctvVideoTrack(VideoFeedID.VIDEO2); playWeirdSound('click'); }}
-                    className={`px-3 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded ${
+                    className={`px-4 py-1.5 text-[10px] uppercase font-bold transition cursor-pointer rounded-r-md ${
                       cctvVideoTrack === VideoFeedID.VIDEO2 
-                        ? 'bg-[#FF4500] text-black font-extrabold font-mono' 
+                        ? 'bg-[#FF4500] text-black font-extrabold font-mono shadow' 
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                     title="Play tactical surveillance video feed 2"
@@ -1438,6 +1492,16 @@ Generated via Tobby Lv's Premium Portal
                 <h1 className="text-3xl font-black tracking-tight uppercase">TOBBY LV</h1>
                 <p className="text-xs font-mono text-stone-700 mt-1 uppercase tracking-wider">Tactical Presence & Experimental Flavor Specialist</p>
                 <p className="text-stone-600 mt-1">Location: Tokyo-based Profile (Chinese Cultural Background)</p>
+                <div className="text-[10px] space-y-1 mt-1.5 text-stone-700 flex flex-col font-mono">
+                  <a href="https://www.youtube.com/shorts/cB2BndeFG_Q" target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                    <Youtube className="w-3 h-3 text-red-600 inline" /> 
+                    <span>YouTube: youtube.com/shorts/cB2BndeFG_Q</span>
+                  </a>
+                  <a href="https://tobby.cc.cd" target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                    <Gamepad2 className="w-3 h-3 text-[#FF4500] inline" /> 
+                    <span>Game: tobby.cc.cd</span>
+                  </a>
+                </div>
               </div>
               <div className="text-right font-mono text-[9px] text-stone-600 space-y-0.5 uppercase">
                 <p>Reference ID: TL-992-G</p>
