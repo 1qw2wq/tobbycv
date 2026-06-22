@@ -24,7 +24,14 @@ import {
   Square,
   Search,
   ExternalLink,
-  ChefHat
+  ChefHat,
+  Maximize2,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Pause,
+  ZoomIn,
+  ZoomOut
 } from 'lucide-react';
 
 // Static assets imported from the workspace assets path
@@ -56,6 +63,15 @@ const dossierImages = [
   { src: extraImg4, title: "Field Operation δ", desc: "Action sequence capturing in natural tactical exploration.", id: "img-3" },
 ];
 
+const tacticalMediaList = [
+  { type: "image", src: extraImg1, title: "Tactical Profile α", desc: "Frontal facial profile of subject Tobby Lv. Primary identifier and target assessment photo.", spec: "TOBBY_LV_01", id: "m-0" },
+  { type: "image", src: extraImg2, title: "Sensory Kitchen β", desc: "Active food aesthetics and flavor testing deck. Japanese sweet-savory testing panel.", spec: "TOBBY_LV_02", id: "m-1" },
+  { type: "image", src: extraImg3, title: "Surveillance Feed γ", desc: "Ambience and environment chromatic/thermal-ready surveillance of Tobby.", spec: "TOBBY_TRACK_03", id: "m-2" },
+  { type: "image", src: extraImg4, title: "Field Operation δ", desc: "High agility physical action sequence captured in natural tactical setting.", spec: "TOBBY_TRACK_04", id: "m-3" },
+  { type: "video", src: "/videos/cbca78f178d8cbe4127963ed2c52dc83.mp4", title: "Surveillance Footage I", desc: "Surveillance feed of the target's active field exploration in designated zone.", spec: "RECON_FEED_01", id: "m-4" },
+  { type: "video", src: "/videos/7e7a758c1482a69f0926e395d8fb9044.mp4", title: "Surveillance Footage II", desc: "Primary high resolution recording capturing subject's tactical gait and environmental spatial adjustments.", spec: "RECON_FEED_02", id: "m-5" },
+];
+
 export default function TobbyLvCV() {
   const [activeCam, setActiveCam] = React.useState<ActiveCam>(ActiveCam.FOCUS);
   const [isFeedMuted, setIsFeedMuted] = React.useState(false);
@@ -66,6 +82,89 @@ export default function TobbyLvCV() {
   // Interactive Custom Asset Gallery and Video feed states
   const [activeDossierIndex, setActiveDossierIndex] = React.useState(0);
   const [cctvVideoTrack, setCctvVideoTrack] = React.useState<VideoFeedID>(VideoFeedID.SIMULID);
+  const [lightboxOpen, setLightboxOpen] = React.useState(false);
+  const [lightboxIndex, setLightboxIndex] = React.useState(0);
+
+  // Tactical Lightbox Custom internal states
+  const [lbScale, setLbScale] = React.useState(1.0);
+  const [lbOffset, setLbOffset] = React.useState({ x: 0, y: 0 });
+  const [lbFilter, setLbFilter] = React.useState<'normal' | 'thermal' | 'night' | 'amber' | 'grayscale'>('normal');
+  const [lbHudGrid, setLbHudGrid] = React.useState(true);
+  
+  // Video player internal states
+  const lbVideoRef = React.useRef<HTMLVideoElement>(null);
+  const [lbVideoPlaying, setLbVideoPlaying] = React.useState(true);
+  const [lbVideoMuted, setLbVideoMuted] = React.useState(true);
+  const [lbVideoSpeed, setLbVideoSpeed] = React.useState(1.0);
+  const [lbVideoTime, setLbVideoTime] = React.useState(0);
+  const [lbVideoDuration, setLbVideoDuration] = React.useState(0);
+
+  // Keyboard navigation & resets
+  React.useEffect(() => {
+    if (!lightboxOpen) return;
+    
+    // Reset zoom, pan, and video settings when index or modal changes
+    setLbScale(1.0);
+    setLbOffset({ x: 0, y: 0 });
+    setLbVideoPlaying(true);
+    setLbVideoSpeed(1.0);
+    setLbVideoTime(0);
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxOpen(false);
+      else if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev + 1) % tacticalMediaList.length);
+      } else if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev - 1 + tacticalMediaList.length) % tacticalMediaList.length);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, lightboxIndex]);
+
+  // Video progress checker and syncer
+  React.useEffect(() => {
+    const video = lbVideoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => setLbVideoTime(video.currentTime);
+    const handleDurationChange = () => setLbVideoDuration(video.duration);
+    const handleEnded = () => setLbVideoPlaying(false);
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('durationchange', handleDurationChange);
+    video.addEventListener('ended', handleEnded);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('durationchange', handleDurationChange);
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, [lightboxOpen, lightboxIndex]);
+
+  // Synchronize dynamic attributes of <video> element
+  React.useEffect(() => {
+    const video = lbVideoRef.current;
+    if (!video) return;
+    
+    if (lbVideoPlaying) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [lbVideoPlaying, lightboxIndex, lightboxOpen]);
+
+  React.useEffect(() => {
+    const video = lbVideoRef.current;
+    if (!video) return;
+    video.muted = lbVideoMuted;
+  }, [lbVideoMuted, lightboxIndex, lightboxOpen]);
+
+  React.useEffect(() => {
+    const video = lbVideoRef.current;
+    if (!video) return;
+    video.playbackRate = lbVideoSpeed;
+  }, [lbVideoSpeed, lightboxIndex, lightboxOpen]);
 
   // Interactive Target Focus coordinate state
   const focusContainerRef = React.useRef<HTMLDivElement>(null);
@@ -435,7 +534,14 @@ Generated via Tobby Lv's Premium Portal
             {/* PROFILE HEADSHOT OR CARD */}
             <div className="bg-[#1A1A1A] border-l-4 border-[#FF4500] p-6 flex flex-col justify-between h-full space-y-6 print:border-l-2 print:border-zinc-950 print:bg-white print:p-0 print:text-black">
               <div>
-                <div className="relative w-full aspect-square bg-zinc-900 border border-zinc-800 overflow-hidden mb-3 group print:max-w-[150px] print:mb-3">
+                <div 
+                  onClick={() => {
+                    setLightboxIndex(activeDossierIndex);
+                    setLightboxOpen(true);
+                  }}
+                  className="relative w-full aspect-square bg-zinc-900 border border-zinc-800 overflow-hidden mb-3 group/dossier cursor-pointer print:max-w-[150px] print:mb-3"
+                  title="Click to zoom and fully view this tactical photo"
+                >
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeDossierIndex}
@@ -451,12 +557,20 @@ Generated via Tobby Lv's Premium Portal
                         fill
                         priority
                         referrerPolicy="no-referrer"
-                        className="object-cover grayscale hover:grayscale-0 transition-all duration-300"
+                        className="object-cover grayscale hover:grayscale-0 transition-all duration-300 group-hover/dossier:scale-105"
                       />
                     </motion.div>
                   </AnimatePresence>
                   <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent pointer-events-none" />
                   
+                  {/* Expand badge overlay */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover/dossier:opacity-100 transition-opacity duration-200 z-10 pointer-events-none">
+                    <Search className="w-8 h-8 text-[#FF4500] stroke-[1.5] mb-2 scale-90 group-hover/dossier:scale-100 transition-all duration-300" />
+                    <span className="text-[10px] font-mono tracking-wider text-[#FF4500] uppercase font-bold px-2 py-0.5 bg-zinc-950 border border-[#FF4500]">
+                      FULL SCREEN RECON
+                    </span>
+                  </div>
+
                   {/* Frame Number Overlay */}
                   <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/80 border border-zinc-800 text-[8px] font-mono tracking-wider z-10 text-[#FF4500]">
                     DOSSIER_FRAME: 0x0{activeDossierIndex + 1}
@@ -847,9 +961,21 @@ Generated via Tobby Lv's Premium Portal
                 )}
 
                 {/* CONTROL FEEDS FOOTER METAHUD */}
-                <div className="absolute bottom-1 right-2 left-2 flex justify-between items-center bg-black/80 p-2 border border-zinc-800 text-[9px] font-mono">
+                <div className="absolute bottom-1 right-2 left-2 flex justify-between items-center bg-black/80 p-2 border border-zinc-800 text-[9px] font-mono z-30">
                   <span className="text-zinc-500">SIGNAL FEED ACTIVE // TACTICAL LAB</span>
                   <div className="flex items-center gap-3">
+                    {cctvVideoTrack !== VideoFeedID.SIMULID && (
+                      <button
+                        onClick={() => {
+                          setLightboxIndex(cctvVideoTrack === VideoFeedID.VIDEO1 ? 4 : 5);
+                          setLightboxOpen(true);
+                        }}
+                        className="text-[#FF4500] hover:text-white font-bold bg-zinc-950 px-1.5 py-0.5 border border-[#FF4500]/55 hover:border-[#FF4500] transition flex items-center gap-1 cursor-pointer"
+                        title="Expand active video feed to full-screen view"
+                      >
+                        <Maximize2 className="w-3 h-3" /> [EXPAND FEED]
+                      </button>
+                    )}
                     <button 
                       onClick={() => setIsFeedMuted(!isFeedMuted)} 
                       className="text-zinc-500 hover:text-white"
@@ -862,8 +988,15 @@ Generated via Tobby Lv's Premium Portal
             </div>
 
             {/* SECONDARY ACTION LAB PHOTO BANNER */}
-            <div className="bg-[#111111] border border-zinc-800 p-5 relative group overflow-hidden">
-              <div className="relative w-full h-36 bg-zinc-955 overflow-hidden">
+            <div 
+              onClick={() => {
+                setLightboxIndex(1); // Sensory Kitchen β has extraImg2 at index 1
+                setLightboxOpen(true);
+              }}
+              className="bg-[#111111] border border-zinc-800 p-5 relative group overflow-hidden cursor-pointer hover:border-[#FF4500]/50 transition-colors"
+              title="Click to view full image in high-res"
+            >
+              <div className="relative w-full h-36 bg-zinc-950 overflow-hidden">
                 <Image
                   src={actionImg}
                   alt="Tobby Lv real research kitchen desktop"
@@ -871,6 +1004,12 @@ Generated via Tobby Lv's Premium Portal
                   referrerPolicy="no-referrer"
                   className="object-cover grayscale group-hover:grayscale-0 transition duration-700 opacity-60 group-hover:opacity-100"
                 />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-none z-10">
+                  <Search className="w-6 h-6 text-[#FF4500] mb-1" />
+                  <span className="text-[10px] font-mono tracking-wider text-[#FF4500] uppercase font-bold px-1.5 py-0.5 bg-zinc-950 border border-[#FF4500]">
+                    [EXPAND PHOTO SPEC]
+                  </span>
+                </div>
               </div>
               <div className="mt-3 flex items-center justify-between">
                 <div>
