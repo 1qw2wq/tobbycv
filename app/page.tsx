@@ -26,6 +26,7 @@ import {
   ExternalLink,
   ChefHat,
   Maximize2,
+  Minimize2,
   ChevronLeft,
   ChevronRight,
   X,
@@ -84,6 +85,8 @@ export default function TobbyLvCV() {
   const [cctvVideoTrack, setCctvVideoTrack] = React.useState<VideoFeedID>(VideoFeedID.SIMULID);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
+  const lightboxRef = React.useRef<HTMLDivElement>(null);
+  const [isNativeFullscreen, setIsNativeFullscreen] = React.useState(false);
 
   // Tactical Lightbox Custom internal states
   const [lbScale, setLbScale] = React.useState(1.0);
@@ -104,10 +107,15 @@ export default function TobbyLvCV() {
     if (!lightboxOpen) return;
     
     // Reset zoom, pan, and video settings when index or modal changes
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLbScale(1.0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLbOffset({ x: 0, y: 0 });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLbVideoPlaying(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLbVideoSpeed(1.0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLbVideoTime(0);
     
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -121,6 +129,19 @@ export default function TobbyLvCV() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxOpen, lightboxIndex]);
+
+  // Track browser-level native fullscreen changes
+  React.useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsNativeFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   // Video progress checker and syncer
   React.useEffect(() => {
@@ -282,6 +303,135 @@ Generated via Tobby Lv's Premium Portal
     setFocusCoord({ x, y });
   };
 
+  // Web Audio Synthesizer for weird tactical and digital effects
+  const playWeirdSound = (type: 'click' | 'sonar' | 'glitch' | 'sweep' | 'alarm' | 'candyA' | 'candyB' | 'candyC' | 'dismiss') => {
+    if (isFeedMuted) return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      
+      if (type === 'click') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.06);
+      } else if (type === 'sonar') {
+        const osc = ctx.createOscillator();
+        const biquad = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.8);
+        biquad.type = 'bandpass';
+        biquad.frequency.setValueAtTime(880, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
+        osc.connect(biquad);
+        biquad.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 1.1);
+      } else if (type === 'glitch') {
+        const now = ctx.currentTime;
+        [0, 0.03, 0.06].forEach((timeOffset) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = Math.random() > 0.5 ? 'triangle' : 'sawtooth';
+          const pitch = 800 + Math.random() * 1200;
+          osc.frequency.setValueAtTime(pitch, now + timeOffset);
+          osc.frequency.setValueAtTime(pitch / 2, now + timeOffset + 0.02);
+          gain.gain.setValueAtTime(0.025, now + timeOffset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.025);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + timeOffset);
+          osc.stop(now + timeOffset + 0.03);
+        });
+      } else if (type === 'sweep') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.14);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.16);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.18);
+      } else if (type === 'alarm') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(650, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(850, ctx.currentTime + 0.08);
+        osc.frequency.linearRampToValueAtTime(650, ctx.currentTime + 0.16);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.22);
+      } else if (type === 'candyA') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.22);
+      } else if (type === 'candyB') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.16);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.22);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.24);
+      } else if (type === 'candyC') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      } else if (type === 'dismiss') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(900, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch {}
+  };
+
   // Web Audio Synthesizer for "Scary Sound meow"
   const triggerScaryMeow = (e?: React.MouseEvent) => {
     if (e) {
@@ -434,6 +584,43 @@ Generated via Tobby Lv's Premium Portal
   return (
     <div className="relative min-h-screen bg-[#0A0A0A] text-[#F5F5F5] selection:bg-[#FF4500]/40 flex flex-col justify-between overflow-x-hidden">
       
+      {/* PERFECT OVERRIDE INJECTION TO FORCE CLEAN SINGLE-SHEET WHITE BACKGROUND DURING PRINT */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          body, html {
+            background: white !important;
+            color: #0c0a09 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+          }
+          #interactive-root, .print\\:hidden, header, footer, main, .no-print {
+            display: none !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+          }
+          .print-container-root {
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 210mm !important;
+            height: auto !important;
+            background: white !important;
+            color: #0c0a09 !important;
+            box-sizing: border-box !important;
+            padding: 24px !important;
+            margin: 0 !important;
+            border: none !important;
+          }
+          @page {
+            size: A4 portrait;
+            margin: 6mm 10mm;
+          }
+        }
+      `}} />
+
       {/* 1. PRINT DIALOG SETUP INSTRUCTION */}
       <AnimatePresence>
         {showExportGuide && (
@@ -442,7 +629,7 @@ Generated via Tobby Lv's Premium Portal
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg bg-zinc-900 text-white rounded-none border-l-4 border-[#FF4500] shadow-2xl p-5 text-sm print:hidden"
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg bg-zinc-900 text-white rounded-2xl border-l-4 border-[#FF4500] shadow-2xl p-5 text-sm print:hidden"
           >
             <div className="flex items-start gap-4">
               <Printer className="w-6 h-6 text-[#FF4500] shrink-0 animate-pulse" />
@@ -452,14 +639,14 @@ Generated via Tobby Lv's Premium Portal
                   We have formatted a beautiful, highly polished single-page A4 PDF dossier for Tobby Lv. 
                   In your browser print popup, select:
                 </p>
-                <div className="bg-black/60 p-3 my-3 font-mono text-[11px] leading-relaxed text-zinc-400 border border-zinc-800">
+                <div className="bg-black/60 p-3 my-3 font-mono text-[11px] leading-relaxed text-zinc-400 rounded-xl border border-zinc-800">
                   &gt; Destination: <span className="text-white">Save as PDF</span><br />
                   &gt; Background Graphics: <span className="text-[#FF4500]">ENABLED</span><br />
                   &gt; Margins: <span className="text-white">NONE or DEFAULT</span>
                 </div>
                 <button 
-                  onClick={() => setShowExportGuide(false)}
-                  className="px-4 py-2 bg-white text-black font-extrabold text-xs uppercase hover:bg-transparent hover:text-white border border-white transition-all"
+                  onClick={() => { setShowExportGuide(false); playWeirdSound('dismiss'); }}
+                  className="px-4 py-2 bg-white text-black font-extrabold text-xs uppercase hover:bg-transparent hover:text-white border border-white rounded-full transition-all cursor-pointer"
                 >
                   Confirm & Close
                 </button>
@@ -469,37 +656,39 @@ Generated via Tobby Lv's Premium Portal
         )}
       </AnimatePresence>
 
-      {/* 2. BRUTALIST PORTAL ACTION HEADER BAR */}
-      <header className="sticky top-0 z-30 w-full bg-[#0A0A0A]/90 backdrop-blur-md border-b border-zinc-800 px-6 py-4 print:hidden">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 bg-[#FF4500] rounded-none animate-pulse" />
-            <span className="font-mono text-xs font-bold tracking-[0.2em] text-zinc-400">
-              SECURE SIGNAL: TOBBY_LV_TACTICAL_INTERFACE
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <button
-              onClick={downloadTextPortfolio}
-              id="download-txt-cv"
-              className="px-5 py-2.5 text-xs font-mono font-bold text-zinc-400 hover:text-white bg-zinc-900 hover:bg-black border border-zinc-700 transition"
-              title="Download structured text resume file directly"
-            >
-              [DOWNLOAD_RAW_TEXT]
-            </button>
+      <div id="interactive-root" className="print:hidden w-full flex flex-col justify-between flex-1">
 
-            <button
-              onClick={handlePrint}
-              id="download-pdf-portfolio"
-              className="bg-white text-black px-5 py-2.5 font-bold uppercase text-xs tracking-wider border border-white hover:bg-transparent hover:text-white transition-colors"
-              title="Prints standard single-sheet vector portfolio document"
-            >
-              DOWNLOAD PORTFOLIO (PDF)
-            </button>
+        {/* 2. ACTIONS HEADER BAR */}
+        <header className="sticky top-0 z-30 w-full bg-[#0A0A0A]/95 backdrop-blur-md px-6 py-6 print:hidden">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-[#FF4500] rounded-none animate-pulse" />
+              <span className="font-mono text-xs font-bold tracking-[0.2em] text-zinc-400">
+                SECURE SIGNAL: TOBBY_LV_TACTICAL_INTERFACE
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => { downloadTextPortfolio(); playWeirdSound('click'); }}
+                id="download-txt-cv"
+                className="text-xs font-mono font-bold text-zinc-400 hover:text-white transition cursor-pointer hover:underline"
+                title="Download structured text resume file directly"
+              >
+                [DOWNLOAD_RAW_TEXT]
+              </button>
+
+              <button
+                onClick={() => { handlePrint(); playWeirdSound('sonar'); }}
+                id="download-pdf-portfolio"
+                className="text-[#FF4500] hover:text-white font-mono font-bold uppercase text-xs tracking-wider transition cursor-pointer hover:underline"
+                title="Prints standard single-sheet vector portfolio document"
+              >
+                [DOWNLOAD_PORTFOLIO_PDF]
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* 3. CORE EXECUTABLE GRID VIEWPORT */}
       <div className="max-w-7xl w-full mx-auto px-6 py-12 flex-1 flex flex-col justify-between print:p-0 print:m-0">
@@ -529,17 +718,18 @@ Generated via Tobby Lv's Premium Portal
         <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch print:block print:space-y-6">
           
           {/* LEFT SECTION (4/12 COLUMNS): BIO SUMMARY + LIMITS PROTOCOL */}
-          <section className="col-span-1 lg:col-span-4 flex flex-col justify-between gap-8 print:w-full print:block">
+          <section className="col-span-1 lg:col-span-4 flex flex-col justify-between gap-12 print:w-full print:block">
             
             {/* PROFILE HEADSHOT OR CARD */}
-            <div className="bg-[#1A1A1A] border-l-4 border-[#FF4500] p-6 flex flex-col justify-between h-full space-y-6 print:border-l-2 print:border-zinc-950 print:bg-white print:p-0 print:text-black">
+            <div className="flex flex-col justify-between h-full space-y-12 print:border-l-2 print:border-zinc-950 print:bg-white print:p-0 print:text-black print:rounded-none">
               <div>
                 <div 
                   onClick={() => {
                     setLightboxIndex(activeDossierIndex);
                     setLightboxOpen(true);
+                    playWeirdSound('sonar');
                   }}
-                  className="relative w-full aspect-square bg-zinc-900 border border-zinc-800 overflow-hidden mb-3 group/dossier cursor-pointer print:max-w-[150px] print:mb-3"
+                  className="relative w-full aspect-square overflow-hidden mb-4 group/dossier cursor-pointer print:max-w-[150px] print:mb-3"
                   title="Click to zoom and fully view this tactical photo"
                 >
                   <AnimatePresence mode="wait">
@@ -572,21 +762,21 @@ Generated via Tobby Lv's Premium Portal
                   </div>
 
                   {/* Frame Number Overlay */}
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/80 border border-zinc-800 text-[8px] font-mono tracking-wider z-10 text-[#FF4500]">
+                  <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/80 border border-zinc-900 text-[8px] font-mono tracking-wider z-10 text-[#FF4500]">
                     DOSSIER_FRAME: 0x0{activeDossierIndex + 1}
                   </div>
                 </div>
 
                 {/* Dossier Image Selection Thumbnails Slider */}
-                <div className="grid grid-cols-4 gap-1.5 mb-4">
+                <div className="grid grid-cols-4 gap-2 mb-4">
                   {dossierImages.map((img, idx) => (
                     <button
                       key={img.id}
-                      onClick={() => setActiveDossierIndex(idx)}
-                      className={`relative aspect-square transition overflow-hidden border ${
+                      onClick={() => { setActiveDossierIndex(idx); playWeirdSound('click'); }}
+                      className={`relative aspect-square transition overflow-hidden cursor-pointer ${
                         activeDossierIndex === idx 
-                          ? 'border-[#FF4500] ring-1 ring-[#FF4500]' 
-                          : 'border-zinc-800 opacity-60 hover:opacity-100'
+                          ? 'opacity-100 ring-2 ring-[#FF4500] ring-offset-2 ring-offset-black' 
+                          : 'opacity-40 hover:opacity-100'
                       }`}
                       title={img.title}
                     >
@@ -603,17 +793,17 @@ Generated via Tobby Lv's Premium Portal
                 </div>
 
                 {/* Photo meta descriptor */}
-                <div className="bg-black/40 border border-zinc-850 p-3 text-[10px] font-mono leading-relaxed mb-6">
-                  <div className="flex justify-between text-[9px] text-zinc-500 mb-1 border-b border-[#FF4500]/25 pb-0.5">
+                <div className="text-[10px] font-mono leading-relaxed mb-8 pt-2 pl-1">
+                  <div className="flex justify-between text-[9px] text-zinc-500 mb-2">
                     <span>FILE_SPEC: TOBBY_LV_0{activeDossierIndex + 1}</span>
                     <span>EXIF: AUTO</span>
                   </div>
-                  <span className="text-[#FF4500] font-bold uppercase">{dossierImages[activeDossierIndex].title}</span>
-                  <p className="text-zinc-400 mt-1 text-[11px] leading-snug">{dossierImages[activeDossierIndex].desc}</p>
+                  <span className="text-[#FF4500] font-bold uppercase tracking-wider">{dossierImages[activeDossierIndex].title}</span>
+                  <p className="text-zinc-400 mt-1.5 text-[11px] leading-snug">{dossierImages[activeDossierIndex].desc}</p>
                 </div>
 
-                <h2 className="text-xl font-bold uppercase mb-4 text-[#FF4500] border-b border-[#FF4500]/30 pb-2 print:text-black print:border-black print:text-lg">
-                  Professional Summary
+                <h2 className="text-xs font-semibold tracking-widest uppercase mb-4 text-[#FF4500] print:text-black print:text-lg">
+                  {"// PROFESSIONAL SUMMARY"}
                 </h2>
                 <p className="text-sm leading-relaxed text-zinc-300 print:text-zinc-800 text-justify">
                   A highly distinctive professional characterized by an intense, commanding presence and an innovative, experimental approach to sensory and spatial experiences. Tobby possesses a strong aptitude for Chinese regional and cultural academic subjects, though he operates primarily in non-linguistic areas. He is currently working on refining his highly specific culinary theories regarding sweet-and-savory flavor combinations and maintains a specialized set of tactical physical abilities.
@@ -621,49 +811,50 @@ Generated via Tobby Lv's Premium Portal
               </div>
 
               {/* Education section in profile column */}
-              <div className="pt-6 border-t border-zinc-800 print:border-zinc-300">
-                <h2 className="text-lg font-bold uppercase mb-3 text-[#FF4500] print:text-black">Academic Strengths & Education</h2>
+              <div className="pt-10">
+                <h2 className="text-xs font-semibold tracking-widest uppercase mb-4 text-[#FF4500] print:text-black">
+                  {"// ACADEMIC STRENGTHS & EDUCATION"}
+                </h2>
                 <p className="text-xs font-mono text-zinc-400 leading-relaxed print:text-zinc-800">
                   &gt; FOCUS AREA: CHINESE REGIONAL HISTORY<br/>
                   &gt; CULTURAL RECOGNITION (NON-VERBAL)<br/>
                   &gt; EXPERIMENTAL FLAVOR THEORY & CHEMISTRY
                 </p>
-                <p className="text-xs text-zinc-500 mt-2 print:text-zinc-600">
+                <p className="text-xs text-zinc-500 mt-3 print:text-zinc-600">
                   Demonstrated advanced aptitude in historical, cultural, or regional topics rather than vocal language acquisition.
                 </p>
               </div>
             </div>
 
             {/* REAL-TIME PROTOCOL LIMITS BANNER */}
-            <div className="bg-zinc-900 border border-zinc-800 p-6 print:border-zinc-300 print:bg-white print:text-black print:p-0">
-              <h3 className="text-xs font-mono font-bold tracking-widest text-[#FF4500] uppercase mb-3 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-5" />
-                <span>LIMITATIONS & DEFICITS</span>
+            <div className="mt-8 print:border-zinc-300 print:bg-white print:text-black print:p-0">
+              <h3 className="text-xs font-semibold tracking-widest text-[#FF4500] uppercase mb-4 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                <span>{"// LIMITATION SPECIFICATIONS"}</span>
               </h3>
-              <ul className="text-xs text-zinc-400 space-y-3 font-mono print:text-zinc-800 list-disc list-inside">
+              <ul className="text-xs text-zinc-400 space-y-4 font-mono print:text-zinc-800 list-disc list-inside pl-1">
                 <li>
-                  <strong className="text-white print:text-black">Linguistic Capacity:</strong> Limited English proficiency. Limited Chinese verbal dialogue (non-verbal specialist).
+                  <strong className="text-zinc-200 print:text-black">Linguistic Capacity:</strong> Limited English proficiency. Limited Chinese verbal dialogue (non-verbal specialist).
                 </li>
                 <li>
-                  <strong className="text-white print:text-black">Information Technology:</strong> 0% training or experience with IT hardware, networking, or systems.
+                  <strong className="text-zinc-200 print:text-black">Information Technology:</strong> 0% training or experience with IT hardware, networking, or systems.
                 </li>
                 <li>
-                  <strong className="text-white print:text-black">Jurisprudence / Law:</strong> No prior background study or training in jurisprudence.
+                  <strong className="text-zinc-200 print:text-black">Jurisprudence / Law:</strong> No prior background study or training in jurisprudence.
                 </li>
               </ul>
             </div>
-
           </section>
 
           {/* MIDDLE SECTION (5/12 COLUMNS): LIVE CCTV CAM & ACTION EXPERIMENT SANDBOX */}
-          <section className="col-span-1 lg:col-span-5 flex flex-col gap-6 print:hidden">
+          <section className="col-span-1 lg:col-span-5 flex flex-col gap-12 print:hidden">
             
             {/* CCTV CAMS PANEL */}
-            <div className="bg-zinc-900 border border-zinc-800 p-6 flex flex-col justify-between flex-1">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
+            <div className="flex flex-col justify-between flex-1 space-y-10">
+              <div className="flex items-center justify-between pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 bg-red-600 rounded-full animate-ping" />
-                  <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">LIVE TACTICAL FEEDS</span>
+                  <span className="w-1.5 h-1.5 bg-red-650 rounded-none animate-ping" />
+                  <span className="font-mono text-xs font-bold text-white uppercase tracking-widest">{"// LIVE SURVEILLANCE FEEDS"}</span>
                 </div>
                 <div className="text-[10px] font-mono text-zinc-500">
                   FPS: {fps} | REC
@@ -671,97 +862,97 @@ Generated via Tobby Lv's Premium Portal
               </div>
 
               {/* Feed selection tab buttons */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-4">
                 <button
-                  onClick={() => { setActiveCam(ActiveCam.FOCUS); setIsHoveringFocus(false); }}
-                  className={`px-3 py-2 text-[11px] font-mono border text-left flex flex-col justify-between transition ${
+                  onClick={() => { setActiveCam(ActiveCam.FOCUS); setIsHoveringFocus(false); playWeirdSound('sweep'); }}
+                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.FOCUS 
-                      ? 'bg-zinc-950 border-[#FF4500] text-[#FF4500]' 
-                      : 'bg-[#151515] border-zinc-800 text-zinc-500 hover:text-white'
+                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
+                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
                   }`}
                 >
-                  <span className="text-[9px] opacity-40">FEED_A</span>
-                  <span className="font-bold flex items-center gap-1 mt-1">
-                    <Eye className="w-3.5 h-3.5" /> TARGETED STARE
+                  <span className="flex items-center gap-2">
+                    <Eye className="w-4 h-4" /> TARGETED STARE
                   </span>
+                  <span className="text-[9px] opacity-40 font-normal">01</span>
                 </button>
 
                 <button
-                  onClick={() => setActiveCam(ActiveCam.HAZARD)}
-                  className={`px-3 py-2 text-[11px] font-mono border text-left flex flex-col justify-between transition ${
+                  onClick={() => { setActiveCam(ActiveCam.HAZARD); playWeirdSound('sweep'); }}
+                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.HAZARD 
-                      ? 'bg-zinc-950 border-[#FF4500] text-[#FF4500]' 
-                      : 'bg-[#151515] border-zinc-800 text-zinc-500 hover:text-white'
+                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
+                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
                   }`}
                 >
-                  <span className="text-[9px] opacity-40">FEED_B</span>
-                  <span className="font-bold flex items-center gap-1 mt-1">
-                    <Droplet className="w-3.5 h-3.5" /> LIQUID SPILL
+                  <span className="flex items-center gap-2">
+                    <Droplet className="w-4 h-4" /> LIQUID SPILL
                   </span>
+                  <span className="text-[9px] opacity-40 font-normal">02</span>
                 </button>
 
                 <button
-                  onClick={() => setActiveCam(ActiveCam.ACOUSTIC)}
-                  className={`px-3 py-2 text-[11px] font-mono border text-left flex flex-col justify-between transition ${
+                  onClick={() => { setActiveCam(ActiveCam.ACOUSTIC); playWeirdSound('sweep'); }}
+                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.ACOUSTIC 
-                      ? 'bg-zinc-950 border-[#FF4500] text-[#FF4500]' 
-                      : 'bg-[#151515] border-zinc-800 text-zinc-500 hover:text-white'
+                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
+                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
                   }`}
                 >
-                  <span className="text-[9px] opacity-40">FEED_C</span>
-                  <span className="font-bold flex items-center gap-1 mt-1">
-                    <Volume2 className="w-3.5 h-3.5" /> SCARY SOUND
+                  <span className="flex items-center gap-2">
+                    <Volume2 className="w-4 h-4" /> SCARY SOUND
                   </span>
+                  <span className="text-[9px] opacity-40 font-normal">03</span>
                 </button>
 
                 <button
-                  onClick={() => setActiveCam(ActiveCam.SCRATCH)}
-                  className={`px-3 py-2 text-[11px] font-mono border text-left flex flex-col justify-between transition ${
+                  onClick={() => { setActiveCam(ActiveCam.SCRATCH); playWeirdSound('sweep'); }}
+                  className={`py-1.5 text-[11px] font-mono text-left flex items-center justify-between transition-all cursor-pointer ${
                     activeCam === ActiveCam.SCRATCH 
-                      ? 'bg-zinc-950 border-[#FF4500] text-[#FF4500]' 
-                      : 'bg-[#151515] border-zinc-800 text-zinc-500 hover:text-white'
+                      ? 'text-[#FF4500] font-bold border-l-2 border-[#FF4500] pl-3' 
+                      : 'text-[#8c8c8c] hover:text-white border-l border-zinc-800 pl-3'
                   }`}
                 >
-                  <span className="text-[9px] opacity-40">FEED_D</span>
-                  <span className="font-bold flex items-center gap-1 mt-1">
-                    <Plus className="w-3.5 h-3.5" /> HIT & SCRATCH
+                  <span className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" /> HIT & SCRATCH
                   </span>
+                  <span className="text-[9px] opacity-40 font-normal">04</span>
                 </button>
               </div>
 
               {/* VIDEO STREAM SELECTOR */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 mb-4 bg-zinc-950 p-2.5 border border-zinc-800 text-[10px] font-mono">
-                <span className="text-zinc-500 uppercase tracking-widest font-bold pl-1 flex items-center gap-1 select-none">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 mb-6 text-[10px] font-mono">
+                <span className="text-zinc-400 uppercase tracking-widest font-bold flex items-center gap-1.5 select-none">
                   <Play className="w-3 h-3 text-[#FF4500]" /> BACKGROUND FOOTAGE:
                 </span>
-                <div className="grid grid-cols-3 gap-1 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
-                    onClick={() => setCctvVideoTrack(VideoFeedID.SIMULID)}
-                    className={`px-2 py-1 text-[9px] uppercase font-bold transition border cursor-pointer ${
+                    onClick={() => { setCctvVideoTrack(VideoFeedID.SIMULID); playWeirdSound('click'); }}
+                    className={`px-3 py-1 text-[10px] uppercase font-bold transition cursor-pointer ${
                       cctvVideoTrack === VideoFeedID.SIMULID 
-                        ? 'bg-[#FF4500] text-black border-[#FF4500]' 
-                        : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'
+                        ? 'text-[#FF4500] underline decoration-2' 
+                        : 'text-zinc-550 hover:text-zinc-300'
                     }`}
                   >
                     RAW_HUD
                   </button>
                   <button
-                    onClick={() => setCctvVideoTrack(VideoFeedID.VIDEO1)}
-                    className={`px-2 py-1 text-[9px] uppercase font-bold transition border cursor-pointer ${
+                    onClick={() => { setCctvVideoTrack(VideoFeedID.VIDEO1); playWeirdSound('click'); }}
+                    className={`px-3 py-1 text-[10px] uppercase font-bold transition cursor-pointer ${
                       cctvVideoTrack === VideoFeedID.VIDEO1 
-                        ? 'bg-[#FF4500] text-black border-[#FF4500]' 
-                        : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:text-white'
+                        ? 'text-[#FF4500] underline decoration-2' 
+                        : 'text-zinc-550 hover:text-zinc-300'
                     }`}
                     title="Play tactical surveillance video feed 1"
                   >
                     V_FEED_01
                   </button>
                   <button
-                    onClick={() => setCctvVideoTrack(VideoFeedID.VIDEO2)}
-                    className={`px-2 py-1 text-[9px] uppercase font-bold transition border cursor-pointer ${
+                    onClick={() => { setCctvVideoTrack(VideoFeedID.VIDEO2); playWeirdSound('click'); }}
+                    className={`px-3 py-1 text-[10px] uppercase font-bold transition cursor-pointer ${
                       cctvVideoTrack === VideoFeedID.VIDEO2 
-                        ? 'bg-[#FF4500] text-black border-[#FF4500]' 
-                        : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:text-white'
+                        ? 'text-[#FF4500] underline decoration-2' 
+                        : 'text-zinc-550 hover:text-zinc-300'
                     }`}
                     title="Play tactical surveillance video feed 2"
                   >
@@ -771,10 +962,10 @@ Generated via Tobby Lv's Premium Portal
               </div>
 
               {/* FEED DIGITAL VIEWPORT */}
-              <div className="relative aspect-video w-full bg-black border border-zinc-800 overflow-hidden">
+              <div className="relative aspect-video w-full bg-black overflow-hidden">
                 {/* CRT Interference scanlines */}
-                <div className="absolute inset-x-0 h-0.5 bg-neutral-800/20 top-1/3 animate-pulse pointer-events-none z-15" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.35)_50%)] bg-[size:100%_4px] pointer-events-none z-15" />
+                <div className="absolute inset-x-0 h-0.5 bg-neutral-800/15 top-1/3 animate-pulse pointer-events-none z-15" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.30)_50%)] bg-[size:100%_4px] pointer-events-none z-15" />
 
                 {/* DYNAMIC BACKGROUND SURVEILLANCE VIDEO TRACK */}
                 {cctvVideoTrack !== VideoFeedID.SIMULID && (
@@ -805,7 +996,7 @@ Generated via Tobby Lv's Premium Portal
 
                     {isHoveringFocus && (
                       <div 
-                        className="absolute w-10 h-10 border border-[#FF4500] border-dashed rounded-full pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
+                        className="absolute w-10 h-10 border border-[#FF4500] border-dashed rounded-none pointer-events-none flex items-center justify-center -translate-x-1/2 -translate-y-1/2"
                         style={{ left: `${focusCoord.x * 100}%`, top: `${focusCoord.y * 100}%` }}
                       >
                         <div className="w-1.5 h-1.5 bg-[#FF4500] rounded-none" />
@@ -813,9 +1004,9 @@ Generated via Tobby Lv's Premium Portal
                     )}
 
                     {/* Highly stylized brutalist cat eye array */}
-                    <div className="flex gap-8 items-center justify-center py-4 px-6 bg-zinc-950/90 border border-zinc-800 relative shadow-2xl">
+                    <div className="flex gap-12 items-center justify-center py-4 relative">
                       {/* Left Eye */}
-                      <div className="w-16 h-12 bg-yellow-400 rounded-none relative overflow-hidden flex items-center justify-center border-2 border-yellow-300">
+                      <div className="w-16 h-12 bg-yellow-400 rounded-[50%_15%] relative overflow-hidden flex items-center justify-center border-2 border-yellow-300 shadow-inner">
                         <motion.div 
                           className="w-3.5 h-10 bg-black rounded-none"
                           animate={{
@@ -826,7 +1017,7 @@ Generated via Tobby Lv's Premium Portal
                         />
                       </div>
                       {/* Right Eye */}
-                      <div className="w-16 h-12 bg-yellow-400 rounded-none relative overflow-hidden flex items-center justify-center border-2 border-yellow-300">
+                      <div className="w-16 h-12 bg-yellow-400 rounded-[50%_15%] relative overflow-hidden flex items-center justify-center border-2 border-yellow-300 shadow-inner">
                         <motion.div 
                           className="w-3.5 h-10 bg-black rounded-none"
                           animate={{
@@ -838,7 +1029,7 @@ Generated via Tobby Lv's Premium Portal
                       </div>
                     </div>
 
-                    <p className="mt-4 text-[10px] font-mono text-zinc-300 text-center uppercase tracking-wider bg-black/60 px-2 py-0.5 mt-2">
+                    <p className="text-[10px] font-mono text-zinc-300 text-center uppercase tracking-widest mt-6">
                       {isHoveringFocus 
                         ? `LOC COORDS // X:${(focusCoord.x * 100).toFixed(0)} Y:${((1-focusCoord.y) * 100).toFixed(0)}` 
                         : 'Move pointer here to simulate stare engagement'
@@ -870,7 +1061,7 @@ Generated via Tobby Lv's Premium Portal
                         style={{ left: spill.x, top: spill.y }}
                       >
                         <div 
-                          className="w-full h-full bg-[#FF4500]/20 border-l border-r border-[#FF4500]/80"
+                          className="w-full h-full bg-[#FF4500]/20 border-[#FF4500]/60 border-l border-r"
                           style={{ 
                             transform: `rotate(${spill.angle - 90}deg)`,
                             clipPath: 'polygon(50% 0%, 5% 100%, 95% 100%)'
@@ -880,10 +1071,10 @@ Generated via Tobby Lv's Premium Portal
                     ))}
 
                     <div className="z-10 mb-4 text-center">
-                      <div className="inline-block p-1 bg-black border border-zinc-800 text-[10px] text-zinc-400 font-mono mb-2 uppercase">
+                      <div className="text-[10px] text-[#FF4500] font-mono tracking-wider mb-2 uppercase">
                         Origin Point: Tobby
                       </div>
-                      <p className="text-[10px] font-mono text-zinc-300 uppercase bg-black/50 px-2 py-0.5">Click area to deploy 10-sec slip hazard zone</p>
+                      <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-wide">Click area to deploy 10-sec slip hazard zone</p>
                     </div>
                   </div>
                 )}
@@ -902,20 +1093,20 @@ Generated via Tobby Lv's Premium Portal
                         initial={{ scale: 0.2, opacity: 1 }}
                         animate={{ scale: 4.5, opacity: 0 }}
                         transition={{ duration: 1.2 }}
-                        className="absolute w-24 h-24 border border-[#FF4500] pointer-events-none -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+                        className="absolute w-24 h-24 border border-[#FF4500] rounded-none pointer-events-none -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
                         style={{ left: rip.x, top: rip.y }}
                       >
-                        <div className="w-16 h-16 border border-zinc-800" />
+                        <div className="w-16 h-16 border border-zinc-800 rounded-none" />
                       </motion.div>
                     ))}
 
                     <div className="text-center space-y-4">
-                      <div className="w-16 h-16 rounded-none border border-[#FF4500] bg-black/40 hover:bg-[#FF4500]/20 flex items-center justify-center mx-auto transition">
+                      <div className="w-16 h-16 rounded-full border border-[#FF4500]/50 hover:border-[#FF4500] bg-black/10 flex items-center justify-center mx-auto transition">
                         <Volume2 className="w-8 h-8 text-[#FF4500]" />
                       </div>
                       <div>
-                        <p className="font-mono text-xs text-white bg-black/50 px-2 py-0.5 inline-block">CLICK TO EMIT RADIAL MEOW WAVE</p>
-                        <p className="font-mono text-[9px] text-[#FF4500] uppercase mt-1 bg-black/50 px-2 inline-block">Projection Range: 3.0-meter radial blast</p>
+                        <p className="font-mono text-xs text-white tracking-wide">CLICK TO EMIT RADIAL MEOW WAVE</p>
+                        <p className="font-mono text-[9px] text-[#FF4500] uppercase tracking-widest mt-2">Projection Range: 3.0-meter radial blast</p>
                       </div>
                     </div>
                   </div>
@@ -929,9 +1120,9 @@ Generated via Tobby Lv's Premium Portal
                       cctvVideoTrack !== VideoFeedID.SIMULID ? 'bg-black/30' : 'bg-[#111]'
                     }`}
                   >
-                    <div className="relative w-24 h-40 bg-zinc-900 border border-zinc-800 flex flex-col justify-between p-3 overflow-hidden shadow-2xl">
-                      <div className="absolute inset-x-0 h-4 bg-orange-950 border-b border-[#FF4500] top-2" />
-                      <span className="text-[9px] font-mono text-zinc-600">TARGET DUMMY</span>
+                    <div className="relative w-24 h-40 border border-zinc-800 flex flex-col justify-between p-3 overflow-hidden">
+                      <div className="absolute inset-x-0 h-4 bg-orange-950/20 border-b border-[#FF4500]/50 top-2" />
+                      <span className="text-[9px] font-mono text-zinc-650 font-bold">TARGET DUMMY</span>
 
                       {scratches.map((scratch) => (
                         <div 
@@ -939,20 +1130,20 @@ Generated via Tobby Lv's Premium Portal
                           className="absolute pointer-events-none flex flex-col gap-0.5 shrink-0 -translate-x-1/2 -translate-y-1/2"
                           style={{ left: scratch.x, top: scratch.y, transform: `translate(-50%, -50%) rotate(${scratch.angle}deg)` }}
                         >
-                          <div className="w-8 h-[2px] bg-[#FF4500]" />
-                          <div className="w-9 h-[2px] bg-red-600" />
-                          <div className="w-7 h-[2px] bg-[#FF4500]" />
+                          <div className="w-8 h-[2.5px] bg-[#FF4500]" />
+                          <div className="w-9 h-[2.5px] bg-red-600" />
+                          <div className="w-7 h-[2.5px] bg-[#FF4500]" />
                         </div>
                       ))}
 
-                      <div className="text-zinc-500 font-mono text-[8px] text-center">CLICK TO APPY SCRATCH INFLICTS</div>
+                      <div className="text-zinc-550 font-mono text-[8px] text-center">CLICK TO APPLY SCRATCH INFLICTS</div>
                     </div>
 
-                    <div className="absolute bottom-2 right-2 flex items-center gap-2">
-                      <span className="text-[10px] font-mono text-[#FF4500] bg-black/60 px-1">STRIKES: {scratches.length}</span>
+                    <div className="absolute bottom-2 right-2 flex items-center gap-3">
+                      <span className="text-[10px] font-mono text-[#FF4500] font-bold">STRIKES: {scratches.length}</span>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); clearScratch(); }}
-                        className="px-2 py-0.5 bg-zinc-800 text-zinc-300 font-mono text-[9px] uppercase border border-zinc-700 hover:text-white cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); clearScratch(); playWeirdSound('dismiss'); }}
+                        className="text-zinc-400 hover:text-white font-mono text-[10px] uppercase cursor-pointer underline decoration-1 text-xs"
                       >
                         [RESET]
                       </button>
@@ -961,16 +1152,17 @@ Generated via Tobby Lv's Premium Portal
                 )}
 
                 {/* CONTROL FEEDS FOOTER METAHUD */}
-                <div className="absolute bottom-1 right-2 left-2 flex justify-between items-center bg-black/80 p-2 border border-zinc-800 text-[9px] font-mono z-30">
+                <div className="absolute bottom-3 right-4 left-4 flex justify-between items-center bg-black/70 backdrop-blur-sm p-1 text-[9px] font-mono z-30">
                   <span className="text-zinc-500">SIGNAL FEED ACTIVE // TACTICAL LAB</span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     {cctvVideoTrack !== VideoFeedID.SIMULID && (
                       <button
                         onClick={() => {
                           setLightboxIndex(cctvVideoTrack === VideoFeedID.VIDEO1 ? 4 : 5);
                           setLightboxOpen(true);
+                          playWeirdSound('sonar');
                         }}
-                        className="text-[#FF4500] hover:text-white font-bold bg-zinc-950 px-1.5 py-0.5 border border-[#FF4500]/55 hover:border-[#FF4500] transition flex items-center gap-1 cursor-pointer"
+                        className="text-[#FF4500] hover:text-white font-bold transition flex items-center gap-1.5 cursor-pointer underline decoration-1"
                         title="Expand active video feed to full-screen view"
                       >
                         <Maximize2 className="w-3 h-3" /> [EXPAND FEED]
@@ -978,7 +1170,7 @@ Generated via Tobby Lv's Premium Portal
                     )}
                     <button 
                       onClick={() => setIsFeedMuted(!isFeedMuted)} 
-                      className="text-zinc-500 hover:text-white"
+                      className="text-zinc-500 hover:text-white transition cursor-pointer"
                     >
                       {isFeedMuted ? '[SYNTH_OFF]' : '[SYNTH_ACTIVE]'}
                     </button>
@@ -993,25 +1185,25 @@ Generated via Tobby Lv's Premium Portal
                 setLightboxIndex(1); // Sensory Kitchen β has extraImg2 at index 1
                 setLightboxOpen(true);
               }}
-              className="bg-[#111111] border border-zinc-800 p-5 relative group overflow-hidden cursor-pointer hover:border-[#FF4500]/50 transition-colors"
+              className="relative group overflow-hidden cursor-pointer mt-4"
               title="Click to view full image in high-res"
             >
-              <div className="relative w-full h-36 bg-zinc-950 overflow-hidden">
+              <div className="relative w-full h-36 overflow-hidden">
                 <Image
                   src={actionImg}
                   alt="Tobby Lv real research kitchen desktop"
                   fill
                   referrerPolicy="no-referrer"
-                  className="object-cover grayscale group-hover:grayscale-0 transition duration-700 opacity-60 group-hover:opacity-100"
+                  className="object-cover grayscale group-hover:grayscale-0 transition duration-700 opacity-50 group-hover:opacity-100"
                 />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-none z-10">
+                <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center pointer-events-none z-10">
                   <Search className="w-6 h-6 text-[#FF4500] mb-1" />
                   <span className="text-[10px] font-mono tracking-wider text-[#FF4500] uppercase font-bold px-1.5 py-0.5 bg-zinc-950 border border-[#FF4500]">
                     [EXPAND PHOTO SPEC]
                   </span>
                 </div>
               </div>
-              <div className="mt-3 flex items-center justify-between">
+              <div className="mt-4 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-mono text-[#FF4500] uppercase font-bold tracking-wider">SECURE SENSORY STATION // RESEARCH</span>
                   <p className="text-xs text-zinc-400 mt-1">Japanese-based sweet-savory combinations testing panel</p>
@@ -1019,52 +1211,51 @@ Generated via Tobby Lv's Premium Portal
                 <ChefHat className="w-5 h-5 text-zinc-600" />
               </div>
             </div>
-
           </section>
 
           {/* RIGHT SECTION (3/12 COLUMNS): RADICAL FLAVOR PROFILE & CULINARY SANDBOX */}
-          <section className="col-span-1 lg:col-span-3 flex flex-col justify-between gap-6 print:w-full print:block">
+          <section className="col-span-1 lg:col-span-3 flex flex-col justify-between gap-12 print:w-full print:block">
             
             {/* SAVORY + SWEET FLAVOR DOSSIER */}
-            <div className="bg-white text-black p-6 flex flex-col justify-between h-full print:border-l-2 print:border-zinc-950 print:p-0">
+            <div className="flex flex-col justify-between h-full space-y-10 print:border-l-2 print:border-zinc-950 print:p-0">
               <div>
-                <h3 className="text-sm font-black uppercase mb-4 tracking-tight border-b-2 border-black pb-1 flex items-center gap-2">
+                <h3 className="text-sm font-black uppercase mb-6 tracking-widest text-[#FF4500] border-b border-zinc-800 pb-2 flex items-center gap-2">
                   <Flame className="w-4 h-4 text-[#FF4500]" />
-                  <span>Gastronomic Profile</span>
+                  <span>{"// GASTRONOMIC PROFILE"}</span>
                 </h3>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <h4 className="text-xs font-bold uppercase text-zinc-500 mb-1">Dietary Habits Overview</h4>
-                    <p className="text-xs leading-relaxed text-zinc-800">
+                    <h4 className="text-[11px] font-bold uppercase text-zinc-500 mb-1 tracking-wider">Dietary Habits Overview</h4>
+                    <p className="text-xs leading-relaxed text-zinc-300">
                       Tobby operates a non-traditional palate theory applying sudden spikes of glucose directly inside salty amino platforms.
                     </p>
                   </div>
 
-                  <div className="space-y-2 text-xs text-zinc-900 font-mono">
-                    <p className="border-l-2 border-black pl-2 py-0.5 font-bold text-[11px]">
-                      &gt; Starch & Candy Fusion:<br/>
-                      <span className="font-normal text-zinc-600 block pl-2">Combines sugary confectionery candies with noodles & white rice.</span>
+                  <div className="space-y-4 text-xs text-zinc-300 font-mono">
+                    <p className="border-l-2 border-[#FF4500]/50 pl-3 py-0.5">
+                      <strong className="text-white block mb-1">Starch & Candy Fusion:</strong>
+                      <span className="text-zinc-400 font-normal pl-2 block">Combines sugary confectionery candies with noodles & white rice.</span>
                     </p>
-                    <p className="border-l-2 border-black pl-2 py-0.5 font-bold text-[11px]">
-                      &gt; Fruit & Protein Marriage:<br/>
-                      <span className="font-normal text-zinc-600 block pl-2">Mixes sticky dried fruits or citrus slices with pork & beef.</span>
+                    <p className="border-l-2 border-[#FF4500]/50 pl-3 py-0.5">
+                      <strong className="text-white block mb-1">Fruit & Protein Marriage:</strong>
+                      <span className="text-zinc-400 font-normal pl-2 block">Mixes sticky dried fruits or citrus slices with pork & beef.</span>
                     </p>
-                    <p className="border-l-2 border-black pl-2 py-0.5 font-bold text-[11px]">
-                      &gt; Threshold Sweetening:<br/>
-                      <span className="font-normal text-zinc-600 block pl-2">Unusually high sugar tolerance; processes high refined sucrose.</span>
+                    <p className="border-l-2 border-[#FF4500]/50 pl-3 py-0.5">
+                      <strong className="text-white block mb-1">Threshold Sweetening:</strong>
+                      <span className="text-zinc-400 font-normal pl-2 block">Unusually high sugar tolerance; processes high refined sucrose.</span>
                     </p>
                   </div>
                 </div>
 
-                <div className="h-px bg-zinc-200 my-4" />
+                <div className="my-8 h-px bg-zinc-800/40" />
 
-                <div className="bg-[#FF4500] text-black p-5">
-                  <h3 className="text-sm font-black uppercase mb-2">Palate Modernization</h3>
-                  <p className="text-[10px] leading-snug font-bold">
-                    REPLACING REFINED CANDY CARDS WITH NATURAL SAUCES & ANCIENT FLAVORS:
+                <div className="py-2">
+                  <h3 className="text-xs font-black uppercase text-[#FF4500] tracking-wider mb-2">Palate Modernization</h3>
+                  <p className="text-[10px] leading-snug font-bold text-zinc-400 uppercase">
+                    Replacing refined candy cards with natural sauces & ancient flavors:
                   </p>
-                  <ul className="text-[10px] font-mono mt-3 space-y-1 text-black pl-1.5 list-disc list-inside">
+                  <ul className="text-[10px] font-mono mt-3 space-y-1 text-zinc-350 list-disc list-inside">
                     <li>THAI PINEAPPLE RICE</li>
                     <li>PEAR SESAME BULGOGI</li>
                     <li>HONEY GINGER TERIYAKI</li>
@@ -1097,20 +1288,20 @@ Generated via Tobby Lv's Premium Portal
             </div>
 
             {/* THE SWEET SAVORY MEAL BLENDER - INTERACTIVE COMPONENT */}
-            <div className="bg-[#111111] border border-zinc-850 p-6 flex flex-col justify-between print:hidden">
+            <div className="flex flex-col justify-between print:hidden mt-6">
               <div>
-                <h4 className="font-mono text-xs font-bold text-white uppercase tracking-wider mb-2">
-                  FLAVOR SYNTHESIZER
+                <h4 className="font-mono text-xs font-bold text-white uppercase tracking-widest mb-2">
+                  {"// FLAVOR SYNTHESIZER"}
                 </h4>
-                <p className="text-[11px] text-zinc-400 font-mono">
+                <p className="text-[11px] text-zinc-450 font-mono">
                   Simulate Tobby&apos;s daily habit: Drop confectionery candies into the hot noodle substrate.
                 </p>
               </div>
 
               {/* Small physical stylized bowl representation */}
-              <div className="my-5 bg-black border border-zinc-800 h-28 relative overflow-hidden flex items-center justify-center shadow-inner">
-                <div className="absolute bottom-0 w-32 h-14 bg-zinc-900 border-b-4 border-l-2 border-r-2 border-zinc-750 rounded-b-full flex items-center justify-center">
-                  <span className="text-[8px] font-mono text-zinc-600 uppercase">SAVORY SOUP BASE</span>
+              <div className="my-6 h-28 relative overflow-hidden flex items-center justify-center border-b border-zinc-800">
+                <div className="absolute bottom-0 w-32 h-14 border-b-4 border-l-2 border-r-2 border-zinc-700 rounded-b-full flex items-center justify-center">
+                  <span className="text-[8px] font-mono text-zinc-550 uppercase tracking-widest">SAVORY SOUP BASE</span>
                 </div>
 
                 {starchyBowl.map((candy) => (
@@ -1118,50 +1309,50 @@ Generated via Tobby Lv's Premium Portal
                     key={candy.id}
                     initial={{ y: -30, opacity: 0 }}
                     animate={{ y: candy.y - 10, opacity: 1 }}
-                    className="absolute w-3.5 h-2 rounded-full shadow-xs"
+                    className="absolute w-3.5 h-2 rounded-none"
                     style={{ left: `${candy.x - 30}px`, backgroundColor: candy.color }}
                   />
                 ))}
 
                 {starchyBowl.length === 0 && (
-                  <span className="text-zinc-600 font-mono text-[10px] text-center px-4 uppercase animate-pulse">0% Additives. Drop starch elements below.</span>
+                  <span className="text-zinc-650 font-mono text-[9px] text-center px-4 uppercase tracking-wider animate-pulse">0% Additives. Drop starch elements below.</span>
                 )}
               </div>
 
               {/* Candy Dropping buttons */}
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-1.5">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-2">
                   <button 
-                    onClick={() => addCandyToNoodle('Candy A', '#FF4500')}
-                    className="py-1 text-[10px] font-mono bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800"
+                    onClick={() => { addCandyToNoodle('Candy A', '#FF4500'); playWeirdSound('candyA'); }}
+                    className="py-1 px-3 text-[10px] font-mono text-zinc-400 hover:text-white transition-all cursor-pointer underline decoration-1 text-left"
                   >
                     + JELLYBEANS
                   </button>
                   <button 
-                    onClick={() => addCandyToNoodle('Candy B', '#eab308')}
-                    className="py-1 text-[10px] font-mono bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800"
+                    onClick={() => { addCandyToNoodle('Candy B', '#eab308'); playWeirdSound('candyB'); }}
+                    className="py-1 px-3 text-[10px] font-mono text-zinc-400 hover:text-white transition-all cursor-pointer underline decoration-1 text-left"
                   >
                     + CANDY CORN
                   </button>
                   <button 
-                    onClick={() => addCandyToNoodle('Candy C', '#a855f7')}
-                    className="py-1 text-[10px] font-mono bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800"
+                    onClick={() => { addCandyToNoodle('Candy C', '#a855f7'); playWeirdSound('candyC'); }}
+                    className="py-1 px-3 text-[10px] font-mono text-zinc-400 hover:text-white transition-all cursor-pointer underline decoration-1 text-left"
                   >
                     + GUMDROPS
                   </button>
                   <button 
-                    onClick={clearStarchyBowl}
-                    className="py-1 text-[10px] font-mono bg-zinc-950 text-zinc-500 hover:text-white border border-[#FF4500]"
+                    onClick={() => { clearStarchyBowl(); playWeirdSound('dismiss'); }}
+                    className="py-1 px-3 text-[10px] font-mono text-[#FF4500] hover:text-white transition-all cursor-pointer underline decoration-1 text-left"
                   >
                     [CLEAR MEAL]
                   </button>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-850 mt-2">
-                  <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+                <div className="pt-4 mt-2">
+                  <div className="flex justify-between text-[9px] font-mono text-zinc-550">
                     <span>GLYCEMIC INDEX LEVEL:</span>
                   </div>
-                  <div className="h-1 bg-zinc-800 w-full mt-1.5 overflow-hidden">
+                  <div className="h-0.5 bg-zinc-900 w-full mt-2 overflow-hidden">
                     <div 
                       className="h-full bg-[#FF4500] transition-all duration-300" 
                       style={{ width: `${Math.min(starchyBowl.length * 15, 100)}%` }} 
@@ -1175,9 +1366,11 @@ Generated via Tobby Lv's Premium Portal
 
         </main>
 
-        {/* COMPACT PRINT-ONLY BEAUTIFIED LAYOUT AND PARAMETERS */}
-        <div className="hidden print:block absolute inset-0 bg-white font-sans text-stone-950 p-6 max-w-[210mm] min-h-[297mm] mx-auto text-xs leading-relaxed">
-          <div className="border border-stone-950 p-6 space-y-4">
+      </div> {/* Close #interactive-root container wrapper */}
+
+      {/* COMPACT PRINT-ONLY BEAUTIFIED LAYOUT AND PARAMETERS */}
+      <div className="hidden print:block print-container-root bg-white font-sans text-stone-950 p-6 max-w-[210mm] mx-auto text-xs leading-relaxed border-0">
+        <div className="border border-stone-950 p-6 space-y-4">
             
             <div className="flex justify-between items-start border-b-2 border-stone-950 pb-4">
               <div>
@@ -1251,6 +1444,403 @@ Generated via Tobby Lv's Premium Portal
 
           </div>
         </div>
+
+        {/* INTERACTIVE FULLSCREEN DOSSIER & VIDEO METRIC LIGHTBOX */}
+        <div className="print:hidden">
+          <AnimatePresence>
+            {lightboxOpen && (
+            <motion.div
+              ref={lightboxRef}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 bg-[#070707] flex flex-col justify-between overflow-hidden text-white font-mono select-none"
+            >
+              {/* Backgrid scanner overlay pattern */}
+              {lbHudGrid && (
+                <div 
+                  className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-40 z-0" 
+                />
+              )}
+              {/* Scanlines layer */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[size:100%_4px] pointer-events-none z-10" />
+
+              {/* LIGHTBOX HEADER */}
+              <header className="z-20 flex justify-between items-center bg-zinc-950 p-4 border-b border-zinc-900 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 bg-[#FF4500] animate-pulse" />
+                  <div>
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-widest block font-bold leading-none">TACTICAL MEDIA ANALYZER v4</span>
+                    <span className="text-xs uppercase font-bold text-zinc-200 mt-1 block">
+                      {tacticalMediaList[lightboxIndex].title}{" // "}{tacticalMediaList[lightboxIndex].spec}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => { setLbHudGrid(!lbHudGrid); playWeirdSound('click'); }}
+                    className={`px-3 py-1 text-[10px] border tracking-wider transition rounded-full cursor-pointer ${
+                      lbHudGrid 
+                        ? 'border-[#FF4500] bg-[#FF4500]/10 text-[#FF4500]' 
+                        : 'border-zinc-800 text-zinc-500 hover:text-zinc-300'
+                    }`}
+                  >
+                    GRID_OVERLAY: {lbHudGrid ? 'ON' : 'OFF'}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      playWeirdSound('click');
+                      try {
+                        if (!document.fullscreenElement) {
+                          await lightboxRef.current?.requestFullscreen();
+                          setIsNativeFullscreen(true);
+                        } else {
+                          await document.exitFullscreen();
+                          setIsNativeFullscreen(false);
+                        }
+                      } catch (err) {
+                        console.warn("Fullscreen toggle rejected by browser or frame sandboxing.", err);
+                      }
+                    }}
+                    className={`px-3 py-1 text-[10px] border tracking-wider transition rounded-full cursor-pointer flex items-center gap-1.5 ${
+                      isNativeFullscreen 
+                        ? 'border-[#FF4500] bg-[#FF4500]/25 text-white' 
+                        : 'border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                    }`}
+                    title="Toggle true full-screen browser mode"
+                  >
+                    {isNativeFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                    {isNativeFullscreen ? 'WINDOW' : 'FULLSCREEN'}
+                  </button>
+                  <button
+                    onClick={() => { setLightboxOpen(false); playWeirdSound('dismiss'); }}
+                    className="p-1 px-3 border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+                  >
+                    <X className="w-4 h-4" /> [DISMISS]
+                  </button>
+                </div>
+              </header>
+
+              {/* MAIN CONTENT VIEWPORT */}
+              <main className="relative flex-1 flex flex-col lg:flex-row items-stretch justify-center overflow-hidden z-10">
+                {/* PREVIOUS COMPONENT NAVIGATION BUTTON */}
+                <button
+                  onClick={() => { setLightboxIndex((prev) => (prev - 1 + tacticalMediaList.length) % tacticalMediaList.length); playWeirdSound('glitch'); }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-zinc-950/85 border border-zinc-800 text-zinc-400 hover:text-white hover:border-[#FF4500] rounded-full transition group cursor-pointer"
+                  title="Previous Media (Left Arrow)"
+                >
+                  <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+                </button>
+
+                {/* NEXT COMPONENT NAVIGATION BUTTON */}
+                <button
+                  onClick={() => { setLightboxIndex((prev) => (prev + 1) % tacticalMediaList.length); playWeirdSound('glitch'); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-zinc-950/85 border border-zinc-800 text-zinc-400 hover:text-white hover:border-[#FF4500] rounded-full transition group cursor-pointer"
+                  title="Next Media (Right Arrow)"
+                >
+                  <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+
+                {/* CENTRAL STAGE */}
+                <div className="flex-1 relative flex items-center justify-center p-8 overflow-hidden bg-black/40">
+                  {/* Scope target guides */}
+                  {lbHudGrid && (
+                    <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
+                      <div className="absolute w-28 h-28 border border-dashed border-zinc-850 rounded-full opacity-60" />
+                      <div className="absolute w-60 h-60 border border-[#FF4500]/10 rounded-full opacity-40 animate-spin-slow" />
+                      <div className="absolute w-12 h-[1px] bg-[#FF4500]/40 -ml-6" />
+                      <div className="absolute w-12 h-[1px] bg-[#FF4500]/40 ml-12" />
+                      <div className="absolute h-12 w-[1px] bg-[#FF4500]/40 -mt-6" />
+                      <div className="absolute h-12 w-[1px] bg-[#FF4500]/40 mt-12" />
+                    </div>
+                  )}
+
+                  {/* MEDIA HOLDER CONTAINER */}
+                  <div className="relative w-full h-full max-w-5xl max-h-[75vh] flex items-center justify-center overflow-hidden">
+                    {tacticalMediaList[lightboxIndex].type === 'image' ? (
+                      <div 
+                        onMouseDown={(e) => {
+                          if (lbScale > 1) {
+                            e.preventDefault();
+                            const startX = e.clientX;
+                            const startY = e.clientY;
+                            const curX = lbOffset.x;
+                            const curY = lbOffset.y;
+                            
+                            const handleMouseMove = (mmE: MouseEvent) => {
+                              const dx = mmE.clientX - startX;
+                              const dy = mmE.clientY - startY;
+                              setLbOffset({ x: curX + dx, y: curY + dy });
+                            };
+                            
+                            const handleMouseUp = () => {
+                              window.removeEventListener('mousemove', handleMouseMove);
+                              window.removeEventListener('mouseup', handleMouseUp);
+                            };
+                            
+                            window.addEventListener('mousemove', handleMouseMove);
+                            window.addEventListener('mouseup', handleMouseUp);
+                          }
+                        }}
+                        className="relative w-full h-full select-none cursor-grab active:cursor-grabbing"
+                        style={{
+                          transform: `scale(${lbScale}) translate(${lbOffset.x / lbScale}px, ${lbOffset.y / lbScale}px)`,
+                          transition: lbScale === 1 ? 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
+                        }}
+                      >
+                        <Image
+                          src={tacticalMediaList[lightboxIndex].src}
+                          alt={tacticalMediaList[lightboxIndex].title}
+                          fill
+                          priority
+                          sizes="90vw"
+                          referrerPolicy="no-referrer"
+                          className="object-contain transition-all duration-300 pointer-events-none"
+                          style={{
+                            filter: 
+                              lbFilter === 'grayscale' ? 'grayscale(100%) contrast(120%)' :
+                              lbFilter === 'thermal' ? 'contrast(130%) saturate(200%) hue-rotate(90deg) invert(100%)' :
+                              lbFilter === 'night' ? 'brightness(120%) contrast(150%) sepia(100%) hue-rotate(100deg) saturate(350%)' :
+                              lbFilter === 'amber' ? 'sepia(100%) saturate(300%) hue-rotate(15deg) brightness(95%) contrast(110%)' : 'none'
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div 
+                        className="relative w-full h-full flex items-center justify-center overflow-hidden"
+                      >
+                        <video
+                          ref={lbVideoRef}
+                          src={typeof tacticalMediaList[lightboxIndex].src === 'string' ? (tacticalMediaList[lightboxIndex].src as string) : undefined}
+                          autoPlay
+                          loop
+                          playsInline
+                          className="w-full h-full max-h-[85vh] object-contain"
+                          style={{
+                            filter: 
+                              lbFilter === 'grayscale' ? 'grayscale(100%) contrast(120%)' :
+                              lbFilter === 'thermal' ? 'contrast(130%) saturate(200%) hue-rotate(90deg) invert(100%)' :
+                              lbFilter === 'night' ? 'brightness(120%) contrast(150%) sepia(100%) hue-rotate(100deg) saturate(350%)' :
+                              lbFilter === 'amber' ? 'sepia(100%) saturate(300%) hue-rotate(15deg) brightness(95%) contrast(110%)' : 'none'
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* BOTTOM METADATA & CONTROL DECK */}
+                <div className="w-full lg:w-80 shrink-0 bg-[#0b0b0b] border-t lg:border-t-0 lg:border-l border-zinc-900 p-4 font-mono text-zinc-400 flex flex-col justify-between gap-4 select-none z-20 overflow-y-auto">
+                  <div className="space-y-4">
+                    {/* ASSET SPEC */}
+                    <div className="space-y-0.5">
+                      <div className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">ASSET_SPECIFICATION</div>
+                      <div className="text-sm font-bold text-white border-b border-zinc-900 pb-2 flex justify-between items-center">
+                        <span>{tacticalMediaList[lightboxIndex].spec}</span>
+                        <span className="text-[10px] font-mono tracking-widest text-[#FF4500] px-1.5 py-0.5 bg-[#FF4500]/10 border border-[#FF4500]/20">
+                          {tacticalMediaList[lightboxIndex].type.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* ASSET METADATA DESCRIPTION */}
+                    <div className="space-y-1">
+                      <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">OBSERVATION_LOG</div>
+                      <p className="text-xs text-zinc-300 leading-relaxed bg-[#111] p-2 border border-zinc-900 rounded-none">
+                        {tacticalMediaList[lightboxIndex].desc}
+                      </p>
+                    </div>
+
+                    {/* DYNAMIC ZOOM / IMAGE CONTROLS */}
+                    {tacticalMediaList[lightboxIndex].type === 'image' && (
+                      <div className="space-y-2 pt-1 border-t border-zinc-900">
+                        <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">HUD_ZOOM_PAN_MODULE</div>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          <button
+                            onClick={() => setLbScale((s) => Math.min(s + 0.5, 4))}
+                            className="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition text-[10px] font-bold text-center flex items-center justify-center gap-1 cursor-pointer hover:text-[#FF4500]"
+                          >
+                            <ZoomIn className="w-3 h-3" /> ZOOM_IN
+                          </button>
+                          <button
+                            onClick={() => setLbScale((s) => Math.max(s - 0.5, 1))}
+                            className="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition text-[10px] font-bold text-center flex items-center justify-center gap-1 cursor-pointer hover:text-[#FF4500]"
+                          >
+                            <ZoomOut className="w-3 h-3" /> ZOOM_OUT
+                          </button>
+                          <button
+                            onClick={() => { setLbScale(1.0); setLbOffset({ x: 0, y: 0 }); }}
+                            className="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition text-[10px] font-bold text-center flex items-center justify-center gap-1 cursor-pointer hover:text-[#FF4500]"
+                          >
+                            RESET
+                          </button>
+                        </div>
+                        {lbScale > 1 && (
+                          <div className="text-[8px] text-zinc-500 text-center animate-pulse tracking-wide italic font-bold">
+                            🔍 CLICK & DRAG TO PAN ACREAGE
+                          </div>
+                        )}
+                        <div className="text-[10px] flex justify-between bg-zinc-950 p-1.5 border border-zinc-900 mt-1">
+                          <span className="text-zinc-600">SCALE:</span>
+                          <span className="text-white font-bold">{lbScale.toFixed(1)}x</span>
+                          <span className="text-zinc-600 pl-2 font-mono">PAN:</span>
+                          <span className="text-white font-bold">X:{lbOffset.x.toFixed(0)} Y:{lbOffset.y.toFixed(0)}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* DYNAMIC VIDEO PLAYBACK CONTROLS */}
+                    {tacticalMediaList[lightboxIndex].type === 'video' && (
+                      <div className="space-y-3 pt-2 border-t border-zinc-900">
+                        <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">TACTICAL_VIDEO_PLAYER_HUD_CONTROLS</div>
+                        
+                        {/* Play/Pause & Mute / Speed */}
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <button
+                            onClick={() => setLbVideoPlaying(!lbVideoPlaying)}
+                            className="px-2 py-1.5 bg-zinc-900 hover:bg-[#FF4500]/10 border border-zinc-800 hover:border-[#FF4500]/50 transition text-[10px] font-bold flex items-center justify-center gap-1.5 cursor-pointer uppercase text-zinc-200"
+                          >
+                            {lbVideoPlaying ? (
+                              <>
+                                <Pause className="w-3.5 h-3.5 text-[#FF4500]" /> PAUSE_REC
+                              </>
+                            ) : (
+                              <>
+                                <Play className="w-3.5 h-3.5 text-green-500" /> PLAY_LIVE
+                              </>
+                            )}
+                          </button>
+                          
+                          <button
+                            onClick={() => setLbVideoMuted(!lbVideoMuted)}
+                            className="px-2 py-1.5 bg-zinc-900 hover:bg-[#FF4500]/10 border border-zinc-800 hover:border-[#FF4500]/50 transition text-[10px] font-bold flex items-center justify-center gap-1.5 cursor-pointer uppercase text-zinc-200"
+                          >
+                            {lbVideoMuted ? (
+                              <>
+                                <VolumeX className="w-3.5 h-3.5 text-zinc-500" /> UNMUTE_AUDIO
+                              </>
+                            ) : (
+                              <>
+                                <Volume2 className="w-3.5 h-3.5 text-[#FF4500]" /> AUDIO_ON
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* TIME SCRUBBER */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-[9px] text-zinc-500">
+                            <span>TIMELINE_SCRUB</span>
+                            <span className="font-mono text-zinc-300 font-bold">
+                              {lbVideoTime.toFixed(1)}s / {lbVideoDuration.toFixed(1)}s
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max={lbVideoDuration || 100}
+                            step="0.05"
+                            value={lbVideoTime}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              if (lbVideoRef.current) {
+                                lbVideoRef.current.currentTime = val;
+                              }
+                              setLbVideoTime(val);
+                            }}
+                            className="w-full accent-[#FF4500] bg-zinc-900 border border-zinc-800 h-1.5 cursor-pointer rounded-none"
+                          />
+                        </div>
+
+                        {/* SPEED SELECTOR */}
+                        <div className="space-y-1">
+                          <div className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider">SPEED_RATE</div>
+                          <div className="grid grid-cols-4 gap-1 p-0.5 bg-zinc-950 border border-zinc-900 font-mono text-[9px]">
+                            {[0.25, 0.5, 1.0, 2.0].map((spd) => (
+                              <button
+                                key={spd}
+                                onClick={() => setLbVideoSpeed(spd)}
+                                className={`py-1 font-bold tracking-tighter transition cursor-pointer ${
+                                  lbVideoSpeed === spd
+                                    ? 'bg-[#FF4500] text-black'
+                                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                                }`}
+                              >
+                                {spd}x
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* HUD SENSORY FILTERS SELECTION */}
+                    <div className="space-y-2 pt-2 border-t border-zinc-900">
+                      <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">SENSORY_FILTERS_GRID</div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[
+                          { id: 'normal', label: 'NORMAL_RAW', color: 'border-zinc-800 text-zinc-300' },
+                          { id: 'night', label: 'NIGHT_PHOSPHOR', color: 'border-emerald-900/60 text-emerald-400 focus-within:ring-emerald-500' },
+                          { id: 'thermal', label: 'THERMAL_INFRARED', color: 'border-rose-900/60 text-rose-400 focus-within:ring-rose-500' },
+                          { id: 'amber', label: 'AMBER_HUD_SIGNAL', color: 'border-amber-900/60 text-amber-400 focus-within:ring-amber-500' },
+                          { id: 'grayscale', label: 'MONOCHROMIC', color: 'border-zinc-700/60 text-zinc-400 focus-within:ring-zinc-400' },
+                        ].map((flt) => (
+                          <button
+                            key={flt.id}
+                            onClick={() => setLbFilter(flt.id as any)}
+                            className={`px-1.5 py-1 text-[9px] uppercase font-bold text-left border transition flex items-center justify-between cursor-pointer ${flt.color} ${
+                              lbFilter === flt.id 
+                                ? 'bg-zinc-900 text-[#FF4500] border-[#FF4500] shadow-md shadow-[#FF4500]/10' 
+                                : 'bg-transparent hover:bg-zinc-950 hover:border-zinc-700'
+                            }`}
+                          >
+                            {flt.label}
+                            {lbFilter === flt.id && <span className="w-1.5 h-1.5 rounded-full bg-[#FF4500] animate-ping" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BOTTOM DECK LOGS */}
+                  <div className="text-[9px] border-t border-zinc-900 pt-2 text-zinc-600 font-mono leading-relaxed bg-zinc-950/20 p-2 border border-zinc-900">
+                    <div>DEVICE: TR-800 RECON SPEC</div>
+                    <div>RESOLUTION: {tacticalMediaList[lightboxIndex].type === 'image' ? '2560 X 1440 QHD' : '1920 X 1080 FHD'}</div>
+                    <div className="text-[#FF4500] font-bold mt-1 uppercase animate-pulse">● SIGNAL CONNECTED // ENCRYPTION: OK</div>
+                  </div>
+                </div>
+              </main>
+
+              {/* OVERALL LIGHTBOX FOOTER PROGRESS */}
+              <footer className="z-20 bg-zinc-950 border-t border-zinc-900 px-4 py-2.5 flex flex-col sm:flex-row justify-between items-center text-[10px] font-mono text-zinc-500 gap-2 shrink-0">
+                <div className="flex gap-4">
+                  <span>FRAME INDEX: 0x0{lightboxIndex + 1}</span>
+                  <span>TIME OF RECORD: {timeStr}</span>
+                </div>
+                <div className="flex gap-2">
+                  {tacticalMediaList.map((m, idx) => (
+                    <button
+                      key={m.id}
+                      onClick={() => { setLightboxIndex(idx); playWeirdSound('glitch'); }}
+                      className={`w-4 h-4 text-[8px] font-bold font-mono transition border rounded-full flex items-center justify-center cursor-pointer ${
+                        lightboxIndex === idx
+                          ? 'bg-[#FF4500] text-black border-[#FF4500]'
+                          : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-500'
+                      }`}
+                      title={`Go to detail ${idx + 1}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+                <div>SECURE CONNECTION ENCRYPTED STATUS // SYSTEM: 4.0.2</div>
+              </footer>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
         {/* BRUTALIST THEMED SYSTEM FOOTER */}
         <footer className="mt-16 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono uppercase text-zinc-500 gap-4 print:hidden">
